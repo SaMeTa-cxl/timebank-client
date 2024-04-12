@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # my-vue-demo
 
 ## Project setup
@@ -22,3 +23,6 @@ npm run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+=======
+# timebank-client
+>>>>>>> ffda407c8d2f66158f989626f7a1b8118de28213
