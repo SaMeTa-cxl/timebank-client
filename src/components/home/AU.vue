@@ -55,34 +55,34 @@ export default {
     }
   },
   created() {
-    //登陆成功后，建立websocket连接，获取未读消息，显示小红点
-    // 创建WebSocket连接
-    this.socket = new WebSocket('ws://localhost:8081/');
+    // //登陆成功后，建立websocket连接，获取未读消息，显示小红点
+    // // 创建WebSocket连接
+    // this.socket = new WebSocket('ws://localhost:8081/');
 
-    // 监听WebSocket事件
-    this.socket.onopen = () => {
-      console.log('WebSocket connected');
-    };
+    // // 监听WebSocket事件
+    // this.socket.onopen = () => {
+    //   console.log('WebSocket connected');
+    // };
 
-    this.socket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      // console.log(data)
-      if(data['type'] === 'chat/unread') 
-        this.handleUnreadMsg(data);         /* 处理未读消息 */
-      else 
-        this.handleReceive(data);           /* 处理新收到的消息 */
-    };
+    // this.socket.onmessage = (event) => {
+    //   const data = JSON.parse(event.data);
+    //   // console.log(data)
+    //   if(data['type'] === 'chat/unread') 
+    //     this.handleUnreadMsg(data);         /* 处理未读消息 */
+    //   else 
+    //     this.handleReceive(data);           /* 处理新收到的消息 */
+    // };
 
-    this.socket.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
+    // this.socket.onerror = (error) => {
+    //   console.error('WebSocket error:', error);
+    // };
 
-    this.socket.onclose = () => {
-      console.log('WebSocket closed');
-    };
+    // this.socket.onclose = () => {
+    //   console.log('WebSocket closed');
+    // };
   },
   beforeDestroy() {
-    this.socket.close();
+    // this.socket.close();
   },  
   mounted () {
     //登陆成功后，建立websocket连接，获取未读消息，显示小红点

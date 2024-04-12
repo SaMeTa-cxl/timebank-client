@@ -72,7 +72,7 @@ export default {
             senderSessionId: this.mySessionId,
             content: this.newMessage,
             contentType: "text",
-            timestamp: Math.floor(Date.now() / 1000),
+            timestamp: Math.floor(Date.now()),
           }
         }
         this.socket.send(JSON.stringify(sendMsg));
@@ -82,7 +82,7 @@ export default {
           id: this.msg.length + 1, // 使用msg数组长度加1作为新消息的id
           senderSessionId: this.mySessionId,
           content: this.newMessage.trim(), // 使用输入框中的消息作为新消息的内容
-          timestamp: Math.floor(Date.now() / 1000), // 使用当前时间作为新消息的时间戳
+          timestamp: Math.floor(Date.now()), // 使用当前时间作为新消息的时间戳
           isRead: true, // 默认设置为已读状态
         };
 
@@ -95,29 +95,30 @@ export default {
     },
     formatMessageInfo(message) {
       const sender = message.senderSessionId;
-      const timestamp = new Date(message.timestamp * 1000); // 将秒转换为毫秒
+      const timestamp = new Date(message.timestamp); 
       return `${sender} - ${timestamp.toLocaleString()}`;
     },
   },
   mounted() {
     // 在这里获取历史消息
     axios({
-      method: 'get',
-      url: 'https://mock.apifox.com/m1/4278752-3920807-default/chat/history',
+      method: 'post',
+      url: 'http://172.26.58.27:8081/demo/chat/history',
       data: JSON.stringify({token: localStorage.getItem('token')}),
     }).then( (response) => {
       this.historyMessages = response.data['msg'];
+      // 使用filter方法过滤出与msg数组不同的元素,即找到真正的历史信息
+      this.historyMessages = this.historyMessages.filter(message => {
+        return !this.msg.some(item => item.id === message.id && item.senderSessionId === message.senderSessionId);
+      });
+      console.log(this.historyMessages);
     }).catch((err) => {
       console.log(err);
       this.$router.push('/');
       localStorage.removeItem('token');
     })
-
-    // 使用filter方法过滤出与msg数组不同的元素,即找到真正的历史信息
-    this.historyMessages = this.historyMessages.filter(message => {
-      return !this.msg.some(item => item.id === message.id && item.senderSessionId === message.senderSessionId);
-    });
-    console.log(this.msg)
+    // console.log("msg:", this.msg)
+    // console.log("history:", this.historyMessages)
   },
 };
 </script>

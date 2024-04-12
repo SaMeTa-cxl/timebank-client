@@ -107,13 +107,11 @@
 </template>
 <script>
 import axios from 'axios';
-import operation from './Operation.vue';
 import SearchLine from './SearchLine.vue';
 import AuFormDialog from './AuFormDialog.vue';
 import AuAddFormDialog from './AuAddFormDialog.vue';
 export default {
   components: {
-    operation,
     SearchLine,
     AuFormDialog,
     AuAddFormDialog

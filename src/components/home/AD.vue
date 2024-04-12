@@ -82,7 +82,7 @@ export default {
     }
   },
   created() {
-    //请求账号信息
+    // 请求账号信息
     axios({
       method: 'post',
       url: 'http://172.26.58.27:8081/demo/adAccount/get',
@@ -91,38 +91,39 @@ export default {
       })
     }).then(response => {
       this.mySessionId = 'AD' + '_' + response.data['id'];
-      console.log(`sessionId: ${this.mySessionId}`);
+
+        // 登陆成功后，建立websocket连接，获取未读消息，显示小红点
+      // 创建WebSocket连接
+      console.log(this.mySessionId)
+      this.socket = new WebSocket(`ws:172.26.58.27:8081/demo/test?sessionId=${this.mySessionId}`);
+
+      // 监听WebSocket事件
+      this.socket.onopen = () => {
+        this.socket.send(JSON.stringify({test: 'hello, world'}));
+        console.log('WebSocket connected');
+      };
+
+      this.socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        console.log(data)
+        if(data['type'] === 'chat/unread') 
+          this.handleUnreadMsg(data);         /* 处理未读消息 */
+        else 
+          this.handleReceive(data);           /* 处理新收到的消息 */
+      };
+
+      this.socket.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
+
+      this.socket.onclose = () => {
+        console.log('WebSocket closed');
+      };
     }).catch(err => {
       console.log(err);
       this.$router.push('/');
       localStorage.removeItem('token');
     })
-    // 登陆成功后，建立websocket连接，获取未读消息，显示小红点
-    // 创建WebSocket连接
-    this.socket = new WebSocket(`ws:172.26.58.27:8081/demo/test?sessionId=${this.mySessionId}`);
-
-    // 监听WebSocket事件
-    this.socket.onopen = () => {
-      this.socket.send(JSON.stringify({test: 'hello, world'}));
-      console.log('WebSocket connected');
-    };
-
-    this.socket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      console.log(data)
-      if(data['type'] === 'chat/unread') 
-        this.handleUnreadMsg(data);         /* 处理未读消息 */
-      else 
-        this.handleReceive(data);           /* 处理新收到的消息 */
-    };
-
-    this.socket.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
-
-    this.socket.onclose = () => {
-      console.log('WebSocket closed');
-    };
   },
   beforeDestroy() {
     this.socket.close();

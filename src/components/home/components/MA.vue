@@ -147,9 +147,9 @@ export default {
 
       //三种角色的请求接口表
       let urlMap = {
-        'AD': 'https://mock.apifox.com/m1/4278752-3920807-default/adAccount/upload',
-        'AU': 'https://mock.apifox.com/m1/4278752-3920807-default/auAccount/upload',
-        'CS': 'https://mock.apifox.com/m1/4278752-3920807-default/csAccount/upload',
+        'AD': 'http://172.26.58.27:8081/demo/adAccount/upload',
+        'AU': 'http://172.26.58.27:8081/demo/auAccount/upload',
+        'CS': 'http://172.26.58.27:8081/demo/csAccount/upload',
       };
 
       // 向服务端发送更新头像请求
@@ -173,9 +173,9 @@ export default {
       })
 
       urlMap = {
-        'AD': 'https://mock.apifox.com/m1/4278752-3920807-default/adAccount/set',
-        'AU': 'https://mock.apifox.com/m1/4278752-3920807-default/auAccount/set',
-        'CS': 'https://mock.apifox.com/m1/4278752-3920807-default/csAccount/set',
+        'AD': 'http://172.26.58.27:8081/demo/adAccount/set',
+        'AU': 'http://172.26.58.27:8081/demo/auAccount/set',
+        'CS': 'http://172.26.58.27:8081/demo/csAccount/set',
       };
       //向服务端发送其他信息的更新请求
       axios({
@@ -235,10 +235,15 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
+          let urlMap = {
+            'AD': 'http://172.26.58.27:8081/demo/adAccount/setPwd',
+            'AU': 'http://172.26.58.27:8081/demo/auAccount/setPwd',
+            'CS': 'http://172.26.58.27:8081/demo/csAccount/setPwd',
+          };
           //向服务端发送更新密码请求
           axios({
             method: 'post',
-            url: 'https://mock.apifox.com/m1/4243695-3884922-default/adAccount/setPwd',
+            url: urlMap['role'],
             data: JSON.stringify({
               token: localStorage.getItem('token'),
               pwd: this.sha256(this.ruleForm.oldPass),
@@ -268,14 +273,14 @@ export default {
   },
   mounted() {
     const urlMap = {
-      'AD': 'https://mock.apifox.com/m1/4278752-3920807-default/adAccount/get',
-      'AU': 'https://mock.apifox.com/m1/4278752-3920807-default/auAccount/get',
-      'CS': 'https://mock.apifox.com/m1/4278752-3920807-default/csAccount/get',
+      'AD': 'http://172.26.58.27:8081/demo/adAccount/get',
+      'AU': 'http://172.26.58.27:8081/demo/auAccount/get',
+      'CS': 'http://172.26.58.27:8081/demo/csAccount/get',
     }
     // console.log(urlMap[localStorage.getItem('role')])
     //请求账号信息
     axios({
-      method: 'get',
+      method: 'post',
       url: urlMap[localStorage.getItem('role')],
       data: JSON.stringify({
         token: localStorage.getItem('token')
@@ -286,6 +291,7 @@ export default {
       this.userInfo.username = response.data['name'];
       this.avatarUrl = response.data['img'];
     }).catch(err => {
+      console.log('wrong!')
       console.log(err);
       this.$router.push('/');
       localStorage.removeItem('token');
