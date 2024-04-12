@@ -82,7 +82,7 @@
                 //发送更新请求
                 axios({
                     method: 'post',
-                    url: 'http://172.26.58.27:8081/demo/CSM/updateById',
+                    url: 'https://mock.apifox.com/m1/4316049-3958895-default/CSM/updateById',
                     data: JSON.stringify(requestData)
                 }).then(response => {
                     if(response.data['status'])
@@ -122,7 +122,7 @@
                     //发送更新请求
                     axios({
                         method: 'post',
-                        url: 'http://172.26.58.27:8081/demo/CSM/updateById',
+                        url: 'https://mock.apifox.com/m1/4316049-3958895-default/CSM/updateById',
                         data: JSON.stringify(requestData)
                     }).then(response => {
                         if(response.data['status'])

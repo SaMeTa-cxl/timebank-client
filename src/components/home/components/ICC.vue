@@ -103,7 +103,7 @@ export default {
     // 在这里获取历史消息
     axios({
       method: 'post',
-      url: 'http://172.26.58.27:8081/demo/chat/history',
+      url: 'https://mock.apifox.com/m1/4316049-3958895-default/chat/history',
       data: JSON.stringify({token: localStorage.getItem('token')}),
     }).then( (response) => {
       this.historyMessages = response.data['msg'];

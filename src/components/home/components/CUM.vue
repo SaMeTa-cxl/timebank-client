@@ -169,7 +169,7 @@ export default {
       onChange(e, index) {
         axios({
           method: 'post',
-          url: 'http://172.26.58.27:8081/demo/common/statusSet',
+          url: 'https://mock.apifox.com/m1/4316049-3958895-default/common/statusSet',
           data: JSON.stringify({
             role: 'CU',
             status: e,
@@ -204,7 +204,7 @@ export default {
           })
         axios({
           method: 'post',
-          url: 'http://172.26.58.27:8081/demo/common/passwordReset',
+          url: 'https://mock.apifox.com/m1/4316049-3958895-default/common/passwordReset',
           data: JSON.stringify({
             role: 'CU',
             id: id,
@@ -244,7 +244,7 @@ export default {
         }).then(() => {
           axios({
             method: 'post',
-            url: 'http://172.26.58.27:8081/demo/common/delete',
+            url: 'https://mock.apifox.com/m1/4316049-3958895-default/common/delete',
             data: JSON.stringify(deleteData)
           }).then(response => {
               if(response.data['status']) {
@@ -281,7 +281,7 @@ export default {
         }).then(() => {
           axios({
             method: 'post',
-            url: 'http://172.26.58.27:8081/demo/common/delete',
+            url: 'https://mock.apifox.com/m1/4316049-3958895-default/common/delete',
             data: JSON.stringify(deleteData)
           }).then(response => {
               if(response.data['status']) {
@@ -315,7 +315,7 @@ export default {
         };
         axios({
           method: 'post',
-          url: 'http://172.26.58.27:8081/demo/CUM/selectById',
+          url: 'https://mock.apifox.com/m1/4316049-3958895-default/CUM/selectById',
           data: JSON.stringify(requestData)
         }).then(response => {
             //成功回调函数，获取返回的数据，和userarray中的数据合并
@@ -363,7 +363,7 @@ export default {
       }
       axios({
         method: 'post',
-        url: 'http://172.26.58.27:8081/demo/common/select',
+        url: 'https://mock.apifox.com/m1/4316049-3958895-default/common/select',
         data: JSON.stringify(searchForm)
       }).then( (response) => {
         console.log(response.data)

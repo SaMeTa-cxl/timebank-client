@@ -147,9 +147,9 @@ export default {
 
       //三种角色的请求接口表
       let urlMap = {
-        'AD': 'http://172.26.58.27:8081/demo/adAccount/upload',
-        'AU': 'http://172.26.58.27:8081/demo/auAccount/upload',
-        'CS': 'http://172.26.58.27:8081/demo/csAccount/upload',
+        'AD': 'https://mock.apifox.com/m1/4316049-3958895-default/adAccount/upload',
+        'AU': 'https://mock.apifox.com/m1/4316049-3958895-default/auAccount/upload',
+        'CS': 'https://mock.apifox.com/m1/4316049-3958895-default/csAccount/upload',
       };
 
       // 向服务端发送更新头像请求
@@ -173,9 +173,9 @@ export default {
       })
 
       urlMap = {
-        'AD': 'http://172.26.58.27:8081/demo/adAccount/set',
-        'AU': 'http://172.26.58.27:8081/demo/auAccount/set',
-        'CS': 'http://172.26.58.27:8081/demo/csAccount/set',
+        'AD': 'https://mock.apifox.com/m1/4316049-3958895-default/adAccount/set',
+        'AU': 'https://mock.apifox.com/m1/4316049-3958895-default/auAccount/set',
+        'CS': 'https://mock.apifox.com/m1/4316049-3958895-default/csAccount/set',
       };
       //向服务端发送其他信息的更新请求
       axios({
@@ -236,9 +236,9 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           let urlMap = {
-            'AD': 'http://172.26.58.27:8081/demo/adAccount/setPwd',
-            'AU': 'http://172.26.58.27:8081/demo/auAccount/setPwd',
-            'CS': 'http://172.26.58.27:8081/demo/csAccount/setPwd',
+            'AD': 'https://mock.apifox.com/m1/4316049-3958895-default/adAccount/setPwd',
+            'AU': 'https://mock.apifox.com/m1/4316049-3958895-default/auAccount/setPwd',
+            'CS': 'https://mock.apifox.com/m1/4316049-3958895-default/csAccount/setPwd',
           };
           //向服务端发送更新密码请求
           axios({
@@ -273,9 +273,9 @@ export default {
   },
   mounted() {
     const urlMap = {
-      'AD': 'http://172.26.58.27:8081/demo/adAccount/get',
-      'AU': 'http://172.26.58.27:8081/demo/auAccount/get',
-      'CS': 'http://172.26.58.27:8081/demo/csAccount/get',
+      'AD': 'https://mock.apifox.com/m1/4316049-3958895-default/adAccount/get',
+      'AU': 'https://mock.apifox.com/m1/4316049-3958895-default/auAccount/get',
+      'CS': 'https://mock.apifox.com/m1/4316049-3958895-default/csAccount/get',
     }
     // console.log(urlMap[localStorage.getItem('role')])
     //请求账号信息

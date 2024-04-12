@@ -126,9 +126,9 @@ export default {
   },
   created() {
     const urlMap = {
-      'AD': 'https://mock.apifox.com/m1/4278752-3920807-default/adAccount/get',
-      'AU': 'https://mock.apifox.com/m1/4278752-3920807-default/auAccount/get',
-      'CS': 'https://mock.apifox.com/m1/4278752-3920807-default/csAccount/get',
+      'AD': 'https://mock.apifox.com/m1/4316049-3958895-default/adAccount/get',
+      'AU': 'https://mock.apifox.com/m1/4316049-3958895-default/auAccount/get',
+      'CS': 'https://mock.apifox.com/m1/4316049-3958895-default/csAccount/get',
     }
     //请求账号信息
     axios({

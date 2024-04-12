@@ -74,7 +74,7 @@ export default {
 
       axios({
           method: 'post',
-          url: 'http://172.26.58.27:8081/demo/login/passwordJudge',
+          url: 'https://mock.apifox.com/m1/4316049-3958895-default/login/passwordJudge',
           data: JSON.stringify(data)
       }).then( (response) => {      //使用箭头函数可以使this指针仍然指向的是该组件对象
           if(response.data['status']) {
@@ -101,7 +101,7 @@ export default {
       };
       axios({
           method: 'post',
-          url: 'http://172.26.58.27:8081/demo/login/tokenJudge',
+          url: 'https://mock.apifox.com/m1/4316049-3958895-default/login/tokenJudge',
           data: JSON.stringify(data)
       }).then( (response) => {      //使用箭头函数可以使this指针仍然指向的是该组件对象
           localStorage.setItem('token', response.data['token']);

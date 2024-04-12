@@ -61,7 +61,7 @@ export default {
             this.form.coin = Number(this.form.coin)
             axios({
                 method: 'post',
-                url: 'http://172.26.58.27:8081/demo/CUM/insert',
+                url: 'https://mock.apifox.com/m1/4316049-3958895-default/CUM/insert',
                 data: JSON.stringify(this.form)
             }).then(response => {
                 if(response.data['status']) {
@@ -71,7 +71,7 @@ export default {
                     });
                     axios({
                         method: 'post',
-                        url: 'http://172.26.58.27:8081/demo/common/select',
+                        url: 'https://mock.apifox.com/m1/4316049-3958895-default/common/select',
                         data: JSON.stringify({
                             id : null,
                             name : null,

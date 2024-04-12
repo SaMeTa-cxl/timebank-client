@@ -85,7 +85,7 @@ export default {
     // 请求账号信息
     axios({
       method: 'post',
-      url: 'http://172.26.58.27:8081/demo/adAccount/get',
+      url: 'https://mock.apifox.com/m1/4316049-3958895-default/adAccount/get',
       data: JSON.stringify({
         token: localStorage.getItem('token')
       })

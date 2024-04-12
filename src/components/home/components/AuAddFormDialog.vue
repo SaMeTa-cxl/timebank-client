@@ -58,7 +58,7 @@ export default {
             this.form.token = localStorage.getItem('token');
             axios({
                 method: 'post',
-                url: 'http://172.26.58.27:8081/demo/AUM/insert',
+                url: 'https://mock.apifox.com/m1/4316049-3958895-default/AUM/insert',
                 data: JSON.stringify(this.form)
             }).then(response => {
                 if(response.data['status'])
