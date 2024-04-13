@@ -7,7 +7,7 @@
           <el-button type="primary" size="small">更多</el-button>
         </template> -->
         <el-descriptions-item label="标题"> {{ task.task_title }} </el-descriptions-item>
-        <el-descriptions-item label="正文"> {{ task.task_content }} </el-descriptions-item>
+        <el-descriptions-item label="正文"> {{ task.task_text }} </el-descriptions-item>
         <el-descriptions-item label="任务时间币数"> {{ task.task_coin}} </el-descriptions-item>
         <el-descriptions-item label="任务发布时间"> {{new Date(task.task_begintime).toLocaleString()}} </el-descriptions-item>
         <el-descriptions-item label="任务截止时间"> {{new Date(task.task_endtime).toLocaleString()}}</el-descriptions-item>

@@ -26,7 +26,7 @@
 <script>
 import axios from 'axios';
 export default {
-  name: 'AROPT',
+  name: 'SOPA',
   data() {
     return {
       tasks: [],

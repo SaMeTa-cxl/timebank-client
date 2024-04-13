@@ -1,21 +1,34 @@
 <template>
   <div class="time-coin-chart">
+    <span>时间币总数：{{totalCoins}}</span>
+    <el-button type="primary" @click="deliverCoins">发放时间币</el-button>
     <div ref="chartRef" style="width: 100%; height: 400px;"></div>
   </div>
 </template>
 
 <script>
 import * as echarts from 'echarts';
+import axios from 'axios';
 
 export default {
   name: 'TCM',
   data() {
     return {
-      timeCoins: [10, 10, 20, 30, 40, 40, 50]
+      timeCoins: [],
+      totalCoins: 0,
     }
   },
-  mounted() {
+  async mounted() {
     console.log("chart!");
+    await axios({
+      method: 'post',
+      url: 'https://mock.apifox.com/m1/4316049-3958895-default/coin/getStatistic',
+      data: JSON.stringify({token: localStorage.getItem('token')})
+    }).then( response => {
+      this.totalCoins = response.data.coinSum;
+      this.timeCoins = response.data.userCoinArray;
+      console.log(this.timeCoins)
+    });
     this.initChart();
   },
   methods: {
@@ -53,6 +66,42 @@ export default {
       };
 
       myChart.setOption(option);
+    },
+    async deliverCoins() {
+      let flag = false;
+      let coinCount = null;
+      await this.$prompt('请输入发布时间币数量', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+      }).then(({ value }) => {
+        flag = true;
+        coinCount = Number(value);
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消'
+        });       
+      });
+
+      if (flag) {
+        axios({
+          method: 'post',
+          url: 'https://mock.apifox.com/m1/4316049-3958895-default/coin/issue',
+          data: JSON.stringify({
+            token: localStorage.getItem('token'),
+            coinNum: coinCount
+          })
+        }).then( response => {
+          if(response.data['status']) {
+            this.$message({
+              message: '发布成功',
+              type: 'success'
+            });
+          }
+          else 
+            this.$message.error('发布失败：'+response.data['msg']);
+        })
+      }
     }
   }
 };
