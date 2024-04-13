@@ -1,172 +1,181 @@
 <template>
-    <div class="wrap" id="wrap">
-        <div class="logGet">
-            <!-- 头部提示信息 -->
-            <div class="logD logDtip">
-                <p class="p1">登录</p>
-            </div>
-            <!-- 输入框 -->
-            <div class="lgD">
-                <img src="" width="20" height="20" alt="" />
-                <input type="text" placeholder="输入用户名" />
-            </div>
-            <div class="lgD">
-                <img src="" width="20" height="20" alt="" />
-                <input type="text" placeholder="输入用户密码" />
-            </div>
-            <div class="logC">
-                <a><button @click="login">登 录</button></a>
-            </div>
-        </div>
+  <div class="login-container">
+    <div class="background"></div>
+    <div class="login-box" @keyup.enter="login">
+      <div class="welcome-message">
+        <!-- <img src="./assets/analysis.png" alt="Decoration Image" class="decoration-image"> -->
+        <h1>欢迎访问时间银行管理平台</h1>
+      </div>
+      <el-form :model="loginForm" ref ="loginForm" class="login-form" :rules="rules" label-width="100px">
+        <el-form-item label="用户名" prop="username">
+          <el-input v-model="loginForm.username" placeholder="请输入用户名"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+          <el-input type="password" v-model="loginForm.password" show-password placeholder="请输入密码"></el-input>
+        </el-form-item>
+        <el-form-item label="身份选择" prop="identity">
+          <el-select v-model="loginForm.identity" placeholder="请选择">
+            <el-option label="管理员" value="AD"></el-option>
+            <el-option label="审核员" value="AU"></el-option>
+            <el-option label="客服" value="CS"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item><el-button type="primary" @click="login">登录</el-button></el-form-item>
+      </el-form>
     </div>
+  </div>
 </template>
-
+  
 <script>
-    import axios from 'axios';
-    export default {
-        methods: {
-            login() {
-                //第一次登录时获取token，并存在浏览器中，在主页面每次发送请求时携带
+import axios from 'axios';
+export default {
+  data() {
+    return {
+      loginForm: {
+        username: '',
+        password: '',
+        identity: 'AD'
+      },
+      rules: {
+        username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+        password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+        identity: [{ required: true, message: '请选择身份', trigger: 'change' }]
+      }
+    };
+  },
+  methods: {
+    sha256(message) {
+      const crypto = require('crypto-js');
+      return crypto.SHA256(message).toString();
+    },
 
-                var flag = true;
-                axios({
-                    method: 'post',
-                    url: 'http://localhost:8081/demo/login',
-                    data: 'username=xiaoming&password=111&info=12'
-                    // data: {
-                    //     username:'xiaoming',
-                    //     password:'111',
-                    //     info: '12'
-                    // }
-                }).then( function(response){
-                    console.log(response.headers['token']);
-                }).catch(function(err){
-                    console.log(err);
-                })
-                
-                if(flag === true ){
-                    // 假设登陆成功，则跳转到home组件
-                    this.$router.push('/home');
-                }
-            }
-        }
+    login() {
+      if(this.loginForm.password == '') {
+        alert("请输入密码");
+        return;
+      }
+      if(this.loginForm.username == '') {
+        alert("请输入用户名");
+        return;
+      }
+
+      let crypto_password = this.sha256(this.loginForm.password);
+      // this.sha256(this.loginForm.password).then(hash => {
+      //   crypto_password = hash;
+      // });
+      console.log(crypto_password);
+      // 第一次登录时获取token,并存在浏览器中,在主页面每次发送请求时携带
+      let data = {
+        username : this.loginForm.username,
+        password : crypto_password,
+        role : this.loginForm.identity
+      }
+      console.log(data);
+
+      axios({
+          method: 'post',
+          url: 'http://172.26.58.27:8081/demo/login/passwordJudge',
+          data: JSON.stringify(data)
+      }).then( (response) => {      //使用箭头函数可以使this指针仍然指向的是该组件对象
+          if(response.data['status']) {
+            console.log(this.loginForm.identity)
+            this.$router.push(`/${this.loginForm.identity}`);
+            localStorage.setItem('token', response.data['token']);
+            localStorage.setItem('role', this.loginForm.identity);
+          }
+          else {
+            alert('用户名或密码错误！请检查后重新输入');
+            this.loginForm.username = '';
+            this.loginForm.password = '';
+            this.loginForm.identity = 'AD';
+          }
+      }).catch(function(err){
+          console.log(err);
+      })
     }
+  },
+  created() {
+    if(localStorage.getItem('token') != null) {
+      let data = {
+        token: localStorage.getItem('token')
+      };
+      axios({
+          method: 'post',
+          url: 'http://172.26.58.27:8081/demo/login/tokenJudge',
+          data: JSON.stringify(data)
+      }).then( (response) => {      //使用箭头函数可以使this指针仍然指向的是该组件对象
+          localStorage.setItem('token', response.data['token']);
+          this.$router.push(`/${localStorage.role}`);
+      }).catch(function(err){
+          console.log(err);
+          localStorage.removeItem('token');
+      })
+    }
+  }
+}
 </script>
+  
+<style scoped>
+  * {
+    box-sizing: border-box;
+  }
 
-<style>
-    body {
-        background-size: 100%;
-        background-repeat: no-repeat;
-        background-position: center center;
-    }
-
-    * {
-        margin: 0;
-        padding: 0;
-    }
-    .wrap {
-        height: 600px;
-        width: 100%;
-        background-position: center center;
-        position: relative;
-        
-    }
-
-    #head {
-        height: 120px;
-        width: 100;
-        background-color: #66CCCC;
-        text-align: center;
-        position: relative;
-    }
-
-    .logGet {
-        height: 408px;
-        width: 368px;
-        position: absolute;
-        background-color: #FFFFFF;
-        top: 100px;
-        right: 15%;
-    }
-
-    .logC a button {
-        width: 100%;
-        height: 45px;
-        background-color: #ee7700;
-        border: none;
-        color: white;
-        font-size: 18px;
-    }
-
-    .logGet .logD.logDtip .p1 {
-        display: inline-block;
-        font-size: 28px;
-        margin-top: 30px;
-        width: 86%;
-    }
-
-    #wrap .logGet .logD.logDtip {
-        width: 86%;
-        border-bottom: 1px solid #ee7700;
-        margin-bottom: 60px;
-        margin-top: 0px;
-        margin-right: auto;
-        margin-left: auto;
-    }
-
-    .logGet .lgD img {
-        position: absolute;
-        top: 12px;
-        left: 8px;
-    }
-
-    .logGet .lgD input {
-        width: 100%;
-        height: 42px;
-        text-indent: 2.5rem;
-    }
-
-    #wrap .logGet .lgD {
-        width: 86%;
-        position: relative;
-        margin-bottom: 30px;
-        margin-top: 30px;
-        margin-right: auto;
-        margin-left: auto;
-    }
-
-    #wrap .logGet .logC {
-        width: 86%;
-        margin-top: 0px;
-        margin-right: auto;
-        margin-bottom: 0px;
-        margin-left: auto;
-    }
-
-
-    .title {
-        font-family: "宋体";
-        color: #FFFFFF;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        /* 使用css3的transform来实现 */
-        font-size: 36px;
-        height: 40px;
-        width: 30%;
-    }
-
-    .copyright {
-        font-family: "宋体";
-        color: #FFFFFF;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        /* 使用css3的transform来实现 */
-        height: 60px;
-        width: 40%;
-        text-align: center;
-    }
+  .login-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+  }
+  
+  .background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom right, #7f00ff, #00ffea);
+  }
+  
+  .login-box {
+    overflow: hidden;
+    display: flex;
+    /* flex-direction: row; */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(255, 255, 255, 0.6); /* 使用透明白色背景 */
+    border-radius: 15px;
+    box-shadow: 0px 0px 20px #34495e; 
+    width: 600px;
+    max-width: 90%;
+  }
+  
+  .welcome-message {
+    text-align: center;
+    margin: auto;
+    width: 50%;
+  }
+  
+  .decoration-image { 
+    display: flex;  
+    width: 100%; 
+  }
+  
+  .login-form { 
+    margin: auto;
+    margin-right: 10px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .el-form-item {
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .el-button {
+    width: 100%;
+  }
 </style>
+  
