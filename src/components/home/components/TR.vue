@@ -42,7 +42,7 @@ export default {
         data: JSON.stringify({
           token: localStorage.getItem('token'),
           task_id: id,
-          reviewStatus: '2',
+          reviewStatus: '1',
           reviewAdvice: null
         })
       }).then( response => {
@@ -82,7 +82,7 @@ export default {
           data: JSON.stringify({
             token: localStorage.getItem('token'),
             task_id: id,
-            reviewStatus: '1',
+            reviewStatus: '2',
             reviewAdvice: advice
           })
         }).then( response => {
@@ -114,7 +114,7 @@ export default {
   }
 }
 </script>
-<style>
+<style scoped>
   .clearfix:before,
   .clearfix:after {
     display: table;
