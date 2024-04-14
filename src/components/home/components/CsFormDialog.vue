@@ -75,8 +75,8 @@
                 let requestData = {
                     token : localStorage.getItem('token'),
                     id : this.formData.id,
-                    name : this.formData.name,
-                    phone : this.formData.phone,
+                    name : this.formData.name == this.details.name ? null : this.details.name,
+                    phone : this.formData.phone == this.details.phone ? null : this.details.phone,
                     img : this.formData.img
                 };
                 //发送更新请求
@@ -105,8 +105,8 @@
             let requestData = {
                 token : localStorage.getItem('token'),
                 id : this.formData.id,
-                name : this.formData.name,
-                phone : this.formData.phone,
+                name : this.formData.name == this.details.name ? null : this.details.name,
+                phone : this.formData.phone == this.details.phone ? null : this.details.phone,
                 img : this.formData.img
             };
             if(this.$refs.editBtn.$el.innerText == '保存') {

@@ -33,9 +33,8 @@
         <el-descriptions-item label="任务截止时间"> {{new Date(task.task_endtime).toLocaleString()}}</el-descriptions-item>
         <el-descriptions-item label="任务完成时间" v-if="task.task_status[2] == '1' && task.task_status[5] != '2'"> {{new Date(task.task_finishtime).toLocaleString()}}</el-descriptions-item>
         <el-descriptions-item label="任务领取者编号" v-if="task.task_status[0] == '2'"> {{task.task_takerId}}</el-descriptions-item>
-        <el-descriptions-item label="任务领取者名字" v-if="task.task_status[0] == '2'"> {{task.task_takerName}}</el-descriptions-item>
         <el-descriptions-item label="审核不通过理由" v-if="task.task_status[0] == '1'"> {{task.task_advice}}</el-descriptions-item>
-        <el-descriptions-item label="评分"> {{task.task_score}}</el-descriptions-item>
+        <el-descriptions-item label="评分" v-if="task.task_status[3] == '1'"> {{task.task_score}}</el-descriptions-item>
         <el-descriptions-item label="正文"> {{task.task_text}}</el-descriptions-item>
       </el-descriptions>
     </div>
@@ -147,7 +146,6 @@ export default {
       url: 'https://mock.apifox.com/m1/4316049-3958895-default/taskMonitor/info',
       data: JSON.stringify({token: localStorage.getItem('token')}),
     }).then( response => {
-      console.log(response.data);
       this.taskCount.toReview = response.data.task_num1;
       this.taskCount.toReceive = response.data.task_num2;
       this.taskCount.toComplete = response.data.task_num3;

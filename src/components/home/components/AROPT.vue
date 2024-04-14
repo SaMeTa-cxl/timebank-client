@@ -13,9 +13,8 @@
         <el-descriptions-item label="任务截止时间"> {{new Date(task.task_endtime).toLocaleString()}}</el-descriptions-item>
         <el-descriptions-item label="任务地点"> {{task.task_location}}</el-descriptions-item>
         <el-descriptions-item label="任务发布者编号"> {{task.task_publisherId}}</el-descriptions-item>
-        <el-descriptions-item label="任务发布者名字"> {{task.task_publisherName}}</el-descriptions-item>
-        <el-descriptions-item label="任务审核状态"> {{task.reviewStatus == '1' ? '未通过' : '通过'}}</el-descriptions-item>
-        <el-descriptions-item label="任务审核意见"> {{task.reviewAdvice}}</el-descriptions-item>
+        <el-descriptions-item label="任务审核状态"> {{task.task_status[0] == '1' ? '未通过' : '通过'}}</el-descriptions-item>
+        <el-descriptions-item label="任务审核意见" v-if="task.task_status[0] == '1'"> {{task.task_advice}}</el-descriptions-item>
 
       </el-descriptions>
     </div>
@@ -32,12 +31,14 @@ export default {
   },
   created() {
     axios({
-      method: 'get',
-      url: 'https://mock.apifox.com/m2/4278752-3920807-default/161973491',
+      method: 'post',
+      url: 'http://172.26.58.27:8081/demo/taskReview/myHistory',
       data: JSON.stringify({token: localStorage.getItem('token')}),
     }).then( response => {
       console.log(response.data);
       this.tasks = response.data.taskArray;
+    }).catch( err => {
+      console.log(err);
     })
   }
 }
