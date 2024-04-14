@@ -308,7 +308,6 @@ export default {
       //获得选中用户的更多信息
       onMore(index, row) {
         this.selectedIndex = index;
-        this.isEditDialogVisble = true;
         let requestData = {
           id: row.id,
           token: localStorage.getItem('token')
@@ -331,6 +330,9 @@ export default {
             this.details.login = row.login;
             this.details.register = row.register;
             this.details.userStatus = row.userStatus;
+            
+            this.isEditDialogVisble = true;
+            console.log("get details!")
         }).catch(err => {
             console.log(err);
             this.$router.push('/');

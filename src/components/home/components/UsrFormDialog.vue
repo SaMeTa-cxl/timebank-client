@@ -89,12 +89,13 @@ export default {
                 //再更新父组件数据
                 this.$emit('updateData', this.formData);
                 //设置请求数据体
+                console.log("is userCoin equal? ", this.formData.userCoin == this.details.userCoin)
                 let requestData = {
                     token : localStorage.getItem('token'),
                     id : this.formData.id,
-                    name : this.formData.name,
-                    phone : this.formData.phone,
-                    coin : this.formData.coin,
+                    name : this.formData.name == this.details.name ? null : this.details.name,
+                    phone : this.formData.phone == this.details.phone ? null : this.details.phone,
+                    coin : this.formData.userCoin == this.details.userCoin ? null : Number(this.formData.userCoin),
                     img : this.formData.img
                 };
                 console.log(requestData)
@@ -104,11 +105,14 @@ export default {
                     url: 'http://172.26.58.27:8081/demo/CUM/updateById',
                     data: JSON.stringify(requestData)
                 }).then(response => {
-                    if(response.data['status'])
+                    if(response.data['status']) {
                         this.$message({
                             message: '保存成功',
                             type: 'success'
                         });
+                        this.dialogFormVisible = false;
+                        console.log(this.dialogFormVisible)
+                    }
                     else
                         this.$message.error('保存失败：'+response.data['msg']);
 
@@ -124,11 +128,12 @@ export default {
             let requestData = {
                 token : localStorage.getItem('token'),
                 id : this.formData.id,
-                name : this.formData.name,
-                phone : this.formData.phone,
-                coin : this.formData.coin,
+                name : this.formData.name == this.details.name ? null : this.details.name,
+                phone : this.formData.phone == this.details.phone ? null : this.details.phone,
+                coin : this.formData.userCoin == this.details.userCoin ? null : Number(this.formData.userCoin),
                 img : this.formData.img
             };
+            console.log(this.requestData);
             if(this.$refs.editBtn.$el.innerText == '保存') {
                 this.$confirm('检测到未保存的内容，真的要退出吗？', '确认信息', {
                     distinguishCancelAndClose: true,
@@ -187,7 +192,8 @@ export default {
         },
     },
     mounted() {
-        this.formData = this.details;
+        console.log("pass details to formdata!")
+        this.formData = JSON.parse(JSON.stringify(this.details));
     },
 }
 </script>

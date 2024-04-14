@@ -14,7 +14,6 @@
           <el-descriptions-item label="任务发布时间"> {{new Date(task.task_begintime).toLocaleString()}} </el-descriptions-item>
           <el-descriptions-item label="任务截止时间"> {{new Date(task.task_endtime).toLocaleString()}}</el-descriptions-item>
           <el-descriptions-item label="任务发布者编号"> {{task.task_publisherId}}</el-descriptions-item>
-          <el-descriptions-item label="任务发布者名字"> {{task.task_publisherName}}</el-descriptions-item>
           <el-descriptions-item label="正文"> {{task.task_text}}</el-descriptions-item>
         </el-descriptions>
       </div>
@@ -38,11 +37,11 @@ export default {
 
       axios({
         method: 'post',
-        url: 'https://mock.apifox.com/m1/4278752-3920807-default/taskReview/review',
+        url: 'http://172.26.58.27:8081/demo/taskReview/review',
         data: JSON.stringify({
           token: localStorage.getItem('token'),
           task_id: id,
-          reviewStatus: '1',
+          reviewStatus: 2,
           reviewAdvice: null
         })
       }).then( response => {
@@ -55,6 +54,8 @@ export default {
         }
         else 
           this.$message.error('审核失败：'+response.data['msg']);
+      }).catch(err => {
+        console.log(err)
       })
     },
     async onReject(id) {
@@ -78,11 +79,11 @@ export default {
       if (flag) {
         axios({
           method: 'post',
-          url: 'https://mock.apifox.com/m1/4278752-3920807-default/taskReview/review',
+          url: 'http://172.26.58.27:8081/demo/taskReview/review',
           data: JSON.stringify({
             token: localStorage.getItem('token'),
             task_id: id,
-            reviewStatus: '2',
+            reviewStatus: 1,
             reviewAdvice: advice
           })
         }).then( response => {
@@ -101,8 +102,8 @@ export default {
   },
   created() {
     axios({
-      method: 'get',
-      url: 'https://mock.apifox.com/m1/4278752-3920807-default/taskReview/get',
+      method: 'post',
+      url: 'http://172.26.58.27:8081/demo/taskReview/get',
       data: JSON.stringify({token: localStorage.getItem('token')})
     }).then( response => {
       this.taskArray = response.data.taskArray;

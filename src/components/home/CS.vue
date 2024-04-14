@@ -15,7 +15,7 @@
                 内部交流通道
                 <el-badge :hidden="unreadMessagesCount === 0 ? true : false" :value="unreadMessagesCount"></el-badge>
               </el-menu-item>
-              <el-menu-item index="MA">我的账号</el-menu-item>
+              <el-menu-item index="MA" role="CS">我的账号</el-menu-item>
             </el-menu>
           </div>
         </el-col>

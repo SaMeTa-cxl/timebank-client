@@ -24,7 +24,7 @@
                         action="#"
                         :auto-upload="false"
                         :show-file-list="false"
-                        :on-change="handleChange">
+                        :on-change="handleChangeAvatar">
                         <img v-if="avatarUrl" :src="avatarUrl" class="avatar">
                         <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                     </el-upload>
@@ -50,8 +50,8 @@
       </el-tab-pane>
       <el-tab-pane label="修改密码" name="second">
         <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="100px" style="width: 50%;">
-          <el-form-item type="password" label="旧密码" prop="oldPass">
-            <el-input v-model="ruleForm.oldPass"></el-input>
+          <el-form-item label="旧密码" prop="oldPass">
+            <el-input type="password" v-model="ruleForm.oldPass"></el-input>
           </el-form-item>
           <el-form-item label="新密码" prop="pass">
             <el-input type="password" v-model="ruleForm.pass" autocomplete="off"></el-input>
@@ -72,6 +72,7 @@
 <script>
 import axios from 'axios';
 export default {
+  props: ['role'],
   data() {
     var validateOldPass = (rule, value, callback) => {
       if (value === '') {
@@ -111,6 +112,7 @@ export default {
         username: 'user123',
         img: null,
       },
+      hasChangedAvatar: false,
       avatarUrl: null,
       tmpAvatarUrl: null,
       activeName: 'first',
@@ -137,12 +139,12 @@ export default {
       this.editing = true;
       this.formData = { ...this.userInfo };
     },
-    saveChanges() {
+    async saveChanges() {
       // 保存修改
       this.userInfo = { ...this.formData };
       this.editing = false;
 
-      let flag = false;
+      let flag = true;
       let err = '';
 
       //三种角色的请求接口表
@@ -152,25 +154,27 @@ export default {
         'CS': 'http://172.26.58.27:8081/demo/csAccount/upload',
       };
 
-      // 向服务端发送更新头像请求
-      axios({
-        method: 'post',
-        url: urlMap[localStorage.getItem('role')],
-        data: JSON.stringify({
-          img: this.formData.img,
-          token: localStorage.getItem('token'),
+      if(this.hasChangedAvatar) {
+        // 向服务端发送更新头像请求
+        await axios({
+          method: 'post',
+          url: urlMap[localStorage.getItem('role')],
+          data: JSON.stringify({
+            img: this.formData.img,
+            token: localStorage.getItem('token'),
+          })
+        }).then(response => {
+          flag &&= response.data['status'];
+          if(!response.data['status']) {
+            err += response.data['msg'] + ' ';
+            this.avatarUrl = this.tmpAvatarUrl;
+          }
+        }).catch(err => {
+          console.log(err);
+          this.$router.push('/');
+          localStorage.removeItem('token');
         })
-      }).then(response => {
-        flag &&= response.data['status'];
-        if(!response.data['status']) {
-          err += response.data['msg'] + ' ';
-          this.avatarUrl = this.tmpAvatarUrl;
-        }
-      }).catch(err => {
-        console.log(err);
-        this.$router.push('/');
-        localStorage.removeItem('token');
-      })
+      }
 
       urlMap = {
         'AD': 'http://172.26.58.27:8081/demo/adAccount/set',
@@ -178,9 +182,9 @@ export default {
         'CS': 'http://172.26.58.27:8081/demo/csAccount/set',
       };
       //向服务端发送其他信息的更新请求
-      axios({
+      await axios({
         method: 'post',
-        url: urlMap[localStorage.getItem('token')],
+        url: urlMap[localStorage.getItem('role')],
         data: JSON.stringify({
           token: localStorage.getItem('token'),
           name: this.formData.username,
@@ -204,7 +208,8 @@ export default {
       else
         this.$message.error('更新失败：'+err);
     },
-    handleChange(file) {
+    handleChangeAvatar(file) {
+      this.hasChangedAvatar = true;
       // 判断格式和大小要求
       const isJPGorPNG = file.raw.type === 'image/jpeg' || file.raw.type === 'image/png';
       const isLt2M = file.size / 1024 / 1024 < 2;
@@ -243,7 +248,7 @@ export default {
           //向服务端发送更新密码请求
           axios({
             method: 'post',
-            url: urlMap['role'],
+            url: urlMap[localStorage.getItem('role')],
             data: JSON.stringify({
               token: localStorage.getItem('token'),
               pwd: this.sha256(this.ruleForm.oldPass),
@@ -291,7 +296,6 @@ export default {
       this.userInfo.username = response.data['name'];
       this.avatarUrl = response.data['img'];
     }).catch(err => {
-      console.log('wrong!')
       console.log(err);
       this.$router.push('/');
       localStorage.removeItem('token');
