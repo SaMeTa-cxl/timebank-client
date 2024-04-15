@@ -81,23 +81,24 @@ export default {
   },
   created() {
     // 请求账号信息
-    axios({
-      method: 'post',
-      url: 'http://172.26.58.27:8081/demo/adAccount/get',
-      data: JSON.stringify({
-        token: localStorage.getItem('token')
-      })
-    }).then(response => {
-      this.mySessionId = 'AD' + '_' + response.data['id'];
+    // axios({
+    //   method: 'post',
+    //   url: 'http://172.26.58.27:8081/demo/adAccount/get',
+    //   data: JSON.stringify({
+    //     token: localStorage.getItem('token')
+    //   })
+    // }).then(response => {
+      // this.mySessionId = 'AD' + '_' + response.data['id'];
+      this.mySessionId = 'AD_3';
+      console.log("mySessionId:", this.mySessionId)
 
-        // 登陆成功后，建立websocket连接，获取未读消息，显示小红点
+      // 登陆成功后，建立websocket连接，获取未读消息，显示小红点
       // 创建WebSocket连接
       console.log(this.mySessionId)
       this.socket = new WebSocket(`ws:172.26.58.27:8081/demo/test?sessionId=${this.mySessionId}`);
 
       // 监听WebSocket事件
       this.socket.onopen = () => {
-        this.socket.send(JSON.stringify({test: 'hello, world'}));
         console.log('WebSocket connected');
       };
 
@@ -117,18 +118,21 @@ export default {
       this.socket.onclose = () => {
         console.log('WebSocket closed');
       };
-    }).catch(err => {
-      console.log(err);
-      this.$router.push('/');
-      localStorage.removeItem('token');
-    })
+    // }).catch(err => {
+    //   console.log(err);
+    //   this.$router.push('/');
+    //   localStorage.removeItem('token');
+    // })
   },
   beforeDestroy() {
-    this.socket.close();
+    if(this.socket)
+      this.socket.close();
   },  
   methods:{
     handleUnreadMsg(data) {
-      this.msg = this.msg.concat(data['msg']);
+      console.log(data['msg']);
+      if(data['msg'] != null)
+        this.msg = this.msg.concat(data['msg']);
       console.log(this.msg);
     },
     handleReceive(data) {
@@ -154,14 +158,19 @@ export default {
       发送消息给后端，表示消新息已读
     */
      //构建发送信息的结构
+      let readMsgId = this.msg.filter(obj => !obj.isRead).map(obj => obj.id);
+      
       const sendMsg = {
         token : localStorage.getItem('token'),
         type : 'chatIsRead',
-        id : this.msg.filter(obj => !obj.isRead).map(obj => obj.id),
+        id : readMsgId,
       }
 
-      //用websocket发送
-      this.socket.send(JSON.stringify(sendMsg));
+      console.log(readMsgId.length, this.msg.length)
+      if(readMsgId.length != 0) {
+        //用websocket发送
+        this.socket.send(JSON.stringify(sendMsg));
+      }
 
       //将msg中所有的消息的isRead字段改成true
       this.msg = this.msg.map(item => ({...item, isRead : true}));

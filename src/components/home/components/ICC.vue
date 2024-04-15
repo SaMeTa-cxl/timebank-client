@@ -8,7 +8,7 @@
       <div v-show="showHistoryMessages" class="message-window">
         <transition-group name="fade" tag="div" class="message-container">
           <div v-for="(message, index) in historyMessages" :key="index" class="message" :class="{ 'right-message': message.senderSessionId === mySessionId, 'left-message': message.senderSessionId !== mySessionId }">
-            <div>{{ message.content }}</div>
+            <div>{{ messageDecoder(message.content) }}</div>
             <div class="message-info">{{ formatMessageInfo(message) }}</div>
           </div>
         </transition-group>
@@ -25,7 +25,7 @@
         <div v-if="msg.length > 0" class="unread-messages">
           <transition-group name="fade" tag="div" class="message-container">
             <div v-for="(message, index) in msg" :key="index" class="message" :class="{ 'right-message': message.senderSessionId === mySessionId, 'left-message': message.senderSessionId !== mySessionId }">
-              <div>{{ message.content }}</div>
+              <div>{{ messageDecoder(message.content) }}</div>
               <div class="message-info">{{ formatMessageInfo(message) }}</div>
             </div>
           </transition-group>
@@ -54,6 +54,7 @@ export default {
       showHistoryMessages: false,
       historyMessages: [],
       newMessage: '',
+      key: 'abc'
     };
   },
   methods: {
@@ -70,18 +71,19 @@ export default {
           msg: {
             type: "chat",
             senderSessionId: this.mySessionId,
-            content: this.newMessage,
+            content: this.messageEncode(this.newMessage),
             contentType: "text",
             timestamp: Math.floor(Date.now()),
           }
         }
+        console.log(sendMsg)
         this.socket.send(JSON.stringify(sendMsg));
 
         // 模拟收到消息后将消息添加到msg数组中
         const newMsg = {
           id: this.msg.length + 1, // 使用msg数组长度加1作为新消息的id
           senderSessionId: this.mySessionId,
-          content: this.newMessage.trim(), // 使用输入框中的消息作为新消息的内容
+          content: this.messageEncode(this.newMessage), // 使用输入框中的消息作为新消息的内容
           timestamp: Math.floor(Date.now()), // 使用当前时间作为新消息的时间戳
           isRead: true, // 默认设置为已读状态
         };
@@ -98,6 +100,14 @@ export default {
       const timestamp = new Date(message.timestamp); 
       return `${sender} - ${timestamp.toLocaleString()}`;
     },
+    messageDecoder(message) {
+      const CryptoJS = require('crypto-js');
+      return CryptoJS.AES.decrypt(message, this.key).toString(CryptoJS.enc.Utf8);
+    },
+    messageEncode(message) {
+      const CryptoJS = require('crypto-js');
+      return CryptoJS.AES.encrypt(message, this.key).toString();
+    }
   },
   mounted() {
     // 在这里获取历史消息

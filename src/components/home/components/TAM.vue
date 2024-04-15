@@ -100,6 +100,28 @@ export default {
   },
   methods: {
     onSelect(status) {
+
+      if(status == '') {
+        this.tasks = [];
+        for (let key in this.statusMap) 
+          axios({
+            method: 'post',
+            url: 'http://172.26.58.27:8081/demo/taskMonitor/select',
+            data: JSON.stringify({
+              token: localStorage.getItem('token'),
+              status: key,
+            })
+          }).then( response => {
+            this.tasks = this.tasks.concat(response.data.taskArray);
+            console.log(this.tasks);
+          }).catch( err => {
+            console.log(err);
+            this.$router.push('/');
+            localStorage.removeItem('token');
+          })
+        return;
+      }
+
       this.tasks = [];
       console.log('select')
       if(Array.isArray(status)) {
