@@ -1,7 +1,7 @@
 <template>
     <el-dialog title="新增客服" :visible.sync="dialogFormVisible" :before-close="onClose" align = "left" center width="30%"> 
         <el-form :model="form" label-position="left" label-width="auto">
-            <el-form-item label="用户头像">
+            <!-- <el-form-item label="用户头像">
                 <el-upload
                     class="avatar-uploader"
                     action="#"
@@ -11,7 +11,7 @@
                     <img v-if="form.img" :src="form.img" class="avatar">
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
-            </el-form-item>
+            </el-form-item> -->
             <el-form-item label="用户名">
                 <el-input v-model="form.name" autocomplete="off" placeholder="请输入用户名"></el-input>
             </el-form-item>
@@ -38,8 +38,6 @@ export default {
             form: {
                 name: '',
                 phone: '',
-                img: null,
-                icon: 0,
                 token: ''
             },
             blob : null,
@@ -53,8 +51,8 @@ export default {
         onConfirm() {
             this.dialogFormVisible = false;
             this.$emit('closeDialog');
-            console.log(URL.createObjectURL(this.blob));
-            this.form.img = this.blob;
+            // console.log(URL.createObjectURL(this.blob));
+            // this.form.img = this.blob;
             this.form.token = localStorage.getItem('token');
             axios({
                 method: 'post',
@@ -85,17 +83,6 @@ export default {
                 console.log('Blob对象:', this.blob);
             };
             reader.readAsDataURL(file.raw);
-        },
-        dataURLToBlob(dataURL) {
-            const parts = dataURL.split(';base64,');
-            const contentType = parts[0].split(':')[1];
-            const byteString = atob(parts[1]);
-            const arrayBuffer = new ArrayBuffer(byteString.length);
-            const uint8Array = new Uint8Array(arrayBuffer);
-            for (let i = 0; i < byteString.length; i++) {
-                uint8Array[i] = byteString.charCodeAt(i);
-            }
-            return new Blob([arrayBuffer], { type: contentType });
         },
     },
 }

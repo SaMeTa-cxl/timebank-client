@@ -10,7 +10,6 @@
                 反馈处理
                 <el-badge :hidden="unreadFeedbackCount === 0 ? true : false" :value="unreadFeedbackCount"></el-badge>
               </el-menu-item>
-              <el-menu-item index="ROPF">历史反馈</el-menu-item>
               <el-menu-item index="ICC" @click="handleClickICC">
                 内部交流通道
                 <el-badge :hidden="unreadMessagesCount === 0 ? true : false" :value="unreadMessagesCount"></el-badge>
@@ -22,7 +21,8 @@
         <el-col :span="18">
           <div class="ad-main">
             <component 
-              :is="currentComponent" :msg="msg" :socket="socket" role="CS" :feedback="feedback" 
+              :is="currentComponent" :msg="msg" :socket="socket" role="CS" :feedback="feedback"
+              :mySessionId="mySessionId" :cuSessionId="cuSessionId"
               @updateMsg="msg.push($event)"
               @updateFeedback="feedback.push($event)">
             </component>
@@ -64,12 +64,19 @@ export default {
       msg: [],
       feedback: [],
       socket: null,
+      connected: false,
+      mySessionId: '',
+      cuSessionId: '',
     }
   },
   created() {
+    // this.connectToHost();
     //登陆成功后，建立websocket连接，获取未读消息，显示小红点
     // 创建WebSocket连接
-    this.socket = new WebSocket('ws://localhost:8081/');
+    this.mySessionId = 'CS_6';
+    this.cuSessionId = 'CU_21';
+
+    this.socket = new WebSocket(`ws:172.26.58.27:8081/demo/test?sessionId=${this.mySessionId}`);
 
     // 监听WebSocket事件
     this.socket.onopen = () => {
@@ -90,7 +97,7 @@ export default {
     };
 
     this.socket.onerror = (error) => {
-      console.error('WebSocket error:', error);
+      console.log('WebSocket error:', error);
     };
 
     this.socket.onclose = () => {
@@ -102,15 +109,19 @@ export default {
   },  
   methods:{
     handleUnreadFeedback(data) {
-      // console.log(data['msg']);
+      if(data['msg'].length == 0) return;
       this.feedback = this.feedback.concat(data['msg']);
-      console.log(this.feedback);
+      // console.log(data.msg)
+      this.cuSessionId = data.msg[0].senderSessionId;
     },
     handleReceiveFeedback(data) {
+      if(!data['msg']) return;
       let newMessage = data['msg'];
+      this.cuSessionId = data.msg.senderSessionId;
       //如果当前在FP中，则直接将该消息标记为已读后加入feedback,并向websocket发送“已经读取”消息，否则将新消息直接加入feedback
-      if(this.currentComponent === 'ICC') {
+      if(this.currentComponent === 'FP') {
         newMessage.isRead = true;
+        console.log(newMessage);
         this.feedback.push(newMessage);
         this.socket.send(JSON.stringify({
           token : localStorage.getItem('token'),
@@ -121,10 +132,12 @@ export default {
         this.feedback.push(newMessage);
     },
     handleUnreadMsg(data) {
+      if(!data['msg']) return;
       this.msg = this.msg.concat(data['msg']);
       console.log(this.msg);
     },
     handleReceiveMsg(data) {
+      if(!data['msg']) return;
       let newMessage = data['msg'];
       //如果当前在ICC中，则直接将该消息标记为已读后加入msg,并向websocket发送“已经读取”消息，否则将新消息直接加入msg
       if(this.currentComponent === 'ICC') {
@@ -145,11 +158,14 @@ export default {
       /*
         发送消息给后端，表示消息已读
       */
+      let readMsgId = this.msg.filter(obj => !obj.isRead).map(obj => obj.id);
       const sendMsg = {
         token : localStorage.getItem('token'),
         type : 'chatIsRead',
-        id : this.msg.filter(obj => !obj.isRead).map(obj => obj.id),
+        id :  readMsgId,
       }
+
+      if(readMsgId.length == 0) return;
 
       //用websocket发送
       this.socket.send(JSON.stringify(sendMsg));
@@ -161,17 +177,59 @@ export default {
       /*
         发送消息给后端，表示消息已读
       */
+
+      let readFeedbackId = this.feedback.filter(obj => !obj.isRead).map(obj => obj.id);
       const sendMsg = {
         token : localStorage.getItem('token'),
         type : 'feedbackIsRead',
-        id : this.feedback.filter(obj => !obj.isRead).map(obj => obj.id),
+        id : readFeedbackId
       }
+
+      if(readFeedbackId.length == 0) return;
 
       //用websocket发送
       this.socket.send(JSON.stringify(sendMsg));
 
       //将msg中所有的消息的isRead字段改成true
       this.feedback = this.feedback.map(item => ({...item, isRead : true}));
+    
+    },
+    connectToHost() {
+      if(this.connected) return;
+      //登陆成功后，建立websocket连接，获取未读消息，显示小红点
+      // 创建WebSocket连接
+      this.socket = new WebSocket('ws://localhost:8081/');
+
+      // 监听WebSocket事件
+      this.socket.onopen = () => {
+        console.log('WebSocket connected');
+        this.connected = true;
+      };
+
+      this.socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        // console.log(data)
+        if(data['type'] === 'chat/unread') 
+          this.handleUnreadMsg(data);         /* 处理未读消息 */
+        else if(data['type'] === 'chat/receive')
+          this.handleReceiveMsg(data);           /* 处理新收到的消息 */
+        else if(data['type'] === 'feedback/unread')
+          this.handleUnreadFeedback(data);
+        else
+          this.handleReceiveFeedback(data);
+      };
+
+      this.socket.onerror = (error) => {
+        console.log('WebSocket error:', error);
+        this.connected = false;
+        this.connectToHost();
+      };
+
+      this.socket.onclose = () => {
+        console.log('WebSocket closed');
+        this.connected = false;
+        this.connectToHost();
+      };
     }
   }
 }

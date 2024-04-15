@@ -18,7 +18,7 @@
         </el-col>
         <el-col :span="18">
           <div class="ad-main">
-            <component :is="currentComponent" :msg="msg" :socket="socket" role="AU" @updateMsg="msg.push($event)"></component>
+            <component :is="currentComponent" :msg="msg" :socket="socket" role="AU" :mySessionId="mySessionId" @updateMsg="msg.push($event)"></component>
           </div>
         </el-col>
       </el-row>
@@ -31,6 +31,7 @@ import AROPT from './components/AROPT.vue';
 import ICC from './components/ICC.vue'
 import TR from './components/TR.vue';
 import MA from './components/MA.vue';
+// import axios from 'axios'
 
 export default {
   name: 'AU',
@@ -52,47 +53,61 @@ export default {
       currentComponent: '',
       msg: [],
       socket: null,
+      mySessionId: '',
     }
   },
   created() {
-    //登陆成功后，建立websocket连接，获取未读消息，显示小红点
-    // 创建WebSocket连接
-    this.socket = new WebSocket('ws://localhost:8081/');
+    // 请求账号信息
+    // axios({
+    //   method: 'post',
+    //   url: 'http://172.26.58.27:8081/demo/auAccount/get',
+    //   data: JSON.stringify({
+    //     token: localStorage.getItem('token')
+    //   })
+    // }).then(response => {
+      // this.mySessionId = 'AU' + '_' + response.data['id'];
+      this.mySessionId = 'AU_5';
 
-    // 监听WebSocket事件
-    this.socket.onopen = () => {
-      console.log('WebSocket connected');
-    };
+      // 登陆成功后，建立websocket连接，获取未读消息，显示小红点
+      // 创建WebSocket连接
+      console.log(this.mySessionId)
+      this.socket = new WebSocket(`ws:172.26.58.27:8081/demo/test?sessionId=${this.mySessionId}`);
 
-    this.socket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      // console.log(data)
-      if(data['type'] === 'chat/unread') 
-        this.handleUnreadMsg(data);         /* 处理未读消息 */
-      else 
-        this.handleReceive(data);           /* 处理新收到的消息 */
-    };
+      // 监听WebSocket事件
+      this.socket.onopen = () => {
+        console.log('WebSocket connected');
+      };
 
-    this.socket.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
+      this.socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        console.log(data)
+        if(data['type'] === 'chat/unread') 
+          this.handleUnreadMsg(data);         /* 处理未读消息 */
+        else 
+          this.handleReceive(data);           /* 处理新收到的消息 */
+      };
 
-    this.socket.onclose = () => {
-      console.log('WebSocket closed');
-    };
+      this.socket.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
+
+      this.socket.onclose = () => {
+        console.log('WebSocket closed');
+      };
+    // }).catch(err => {
+    //   console.log(err);
+    //   this.$router.push('/');
+    //   localStorage.removeItem('token');
+    // })
   },
   beforeDestroy() {
-    this.socket.close();
+    if(this.socket)
+      this.socket.close();
   },  
-  mounted () {
-    //登陆成功后，建立websocket连接，获取未读消息，显示小红点
-    /*
-    建立连接，获取未读消息
-   */
-  },
   methods:{
     handleUnreadMsg(data) {
-      this.msg = this.msg.concat(data['msg']);
+      if(data['msg'] != null)
+        this.msg = this.msg.concat(data['msg']);
       console.log(this.msg);
     },
     handleReceive(data) {
@@ -117,14 +132,17 @@ export default {
       /*
         发送消息给后端，表示消息已读
       */
+      let readMsgId = this.msg.filter(obj => !obj.isRead).map(obj => obj.id);
       const sendMsg = {
         token : localStorage.getItem('token'),
         type : 'chatIsRead',
-        id : this.msg.filter(obj => !obj.isRead).map(obj => obj.id),
+        id :  readMsgId,
       }
 
-      //用websocket发送
-      this.socket.send(JSON.stringify(sendMsg));
+      if(readMsgId.length != 0) {
+        //用websocket发送
+        this.socket.send(JSON.stringify(sendMsg));
+      }
 
       //将msg中所有的消息的isRead字段改成true
       this.msg = this.msg.map(item => ({...item, isRead : true}));
