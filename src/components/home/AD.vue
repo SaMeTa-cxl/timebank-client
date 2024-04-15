@@ -19,6 +19,7 @@
               <el-menu-item index="TRM">流量监控</el-menu-item>
               <el-menu-item index="SOPA">往期审核汇总</el-menu-item>
               <el-menu-item index="MA" role="AD">我的账号</el-menu-item>
+              <el-menu-item index="MA" role="AD">我的账号</el-menu-item>
             </el-menu>
           </div>
         </el-col>
@@ -87,6 +88,7 @@ export default {
       console.log("mySessionId:", this.mySessionId)
 
       // 登陆成功后，建立websocket连接，获取未读消息，显示小红点
+      // 登陆成功后，建立websocket连接，获取未读消息，显示小红点
       // 创建WebSocket连接
       console.log(this.mySessionId)
       this.socket = new WebSocket(`ws:172.26.58.27:8081/demo/test?sessionId=${this.mySessionId}`);
@@ -117,13 +119,23 @@ export default {
     //   this.$router.push('/');
     //   localStorage.removeItem('token');
     // })
+    // }).catch(err => {
+    //   console.log(err);
+    //   this.$router.push('/');
+    //   localStorage.removeItem('token');
+    // })
   },
   beforeDestroy() {
+    if(this.socket)
+      this.socket.close();
     if(this.socket)
       this.socket.close();
   },  
   methods:{
     handleUnreadMsg(data) {
+      console.log(data['msg']);
+      if(data['msg'] != null)
+        this.msg = this.msg.concat(data['msg']);
       console.log(data['msg']);
       if(data['msg'] != null)
         this.msg = this.msg.concat(data['msg']);
@@ -154,12 +166,20 @@ export default {
      //构建发送信息的结构
       let readMsgId = this.msg.filter(obj => !obj.isRead).map(obj => obj.id);
       
+      let readMsgId = this.msg.filter(obj => !obj.isRead).map(obj => obj.id);
+      
       const sendMsg = {
         token : localStorage.getItem('token'),
         type : 'chatIsRead',
         id : readMsgId,
+        id : readMsgId,
       }
 
+      console.log(readMsgId.length, this.msg.length)
+      if(readMsgId.length != 0) {
+        //用websocket发送
+        this.socket.send(JSON.stringify(sendMsg));
+      }
       console.log(readMsgId.length, this.msg.length)
       if(readMsgId.length != 0) {
         //用websocket发送

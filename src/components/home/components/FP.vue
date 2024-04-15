@@ -9,6 +9,7 @@
         <transition-group name="fade" tag="div" class="message-container">
           <div v-for="(message, index) in historyMessages" :key="index" class="message" :class="{ 'right-message': message.senderSessionId === mySessionId, 'left-message': message.senderSessionId !== mySessionId }">
             <div>{{ messageDecoder(message.content) }}</div>
+            <div>{{ messageDecoder(message.content) }}</div>
             <div class="message-info">{{ formatMessageInfo(message) }}</div>
           </div>
         </transition-group>
@@ -25,6 +26,7 @@
         <div v-if="feedback.length > 0" class="unread-messages">
           <transition-group name="fade" tag="div" class="message-container">
             <div v-for="(message, index) in feedback" :key="index" class="message" :class="{ 'right-message': message.senderSessionId === mySessionId, 'left-message': message.senderSessionId !== mySessionId }">
+              <div>{{ messageDecoder(message.content) }}</div>
               <div>{{ messageDecoder(message.content) }}</div>
               <div class="message-info">{{ formatMessageInfo(message) }}</div>
             </div>
@@ -44,9 +46,11 @@
 <script>
 import axios from 'axios';
 import CryptoJS from 'crypto-js';
+import CryptoJS from 'crypto-js';
 
 export default {
   name: 'FP',
+  props: ['feedback', 'socket', 'role', 'mySessionId', 'cuSessionId'],
   props: ['feedback', 'socket', 'role', 'mySessionId', 'cuSessionId'],
   data() {
     return {
@@ -55,6 +59,7 @@ export default {
       showHistoryMessages: false,
       historyMessages: [],
       newMessage: '',
+      key: 'abc',
       key: 'abc',
     };
   },
@@ -69,6 +74,8 @@ export default {
         console.log('发送消息:', this.newMessage);
         console.log('加密消息：',this.messageEncode(this.newMessage))
         
+        console.log('加密消息：',this.messageEncode(this.newMessage))
+        
         const sendMsg = {
           type: "feedback/send",
           msg: {
@@ -76,11 +83,15 @@ export default {
             senderSessionId: this.mySessionId,
             receiverSessionId: this.cuSessionId,
             content: this.messageEncode(this.newMessage),
+            receiverSessionId: this.cuSessionId,
+            content: this.messageEncode(this.newMessage),
             contentType: "text",
+            timestamp: Math.floor(Date.now()),
             timestamp: Math.floor(Date.now()),
           }
         }
         this.socket.send(JSON.stringify(sendMsg));
+        console.log(sendMsg)
         console.log(sendMsg)
 
         // 模拟收到消息后将消息添加到msg数组中
@@ -90,8 +101,12 @@ export default {
           receiverSessionId: this.cuSessionId,
           content: this.messageEncode(this.newMessage), // 使用输入框中的消息作为新消息的内容
           timestamp: Math.floor(Date.now()), // 使用当前时间作为新消息的时间戳
+          receiverSessionId: this.cuSessionId,
+          content: this.messageEncode(this.newMessage), // 使用输入框中的消息作为新消息的内容
+          timestamp: Math.floor(Date.now()), // 使用当前时间作为新消息的时间戳
           isRead: true, // 默认设置为已读状态
         };
+        console.log('newFeedback:',newFeedback)
         console.log('newFeedback:',newFeedback)
 
         // 将新消息添加到msg数组中
@@ -104,8 +119,18 @@ export default {
     formatMessageInfo(message) {
       const sender = message.senderSessionId;
       const timestamp = new Date(message.timestamp); // 将秒转换为毫秒
+      const timestamp = new Date(message.timestamp); // 将秒转换为毫秒
       return `${sender} - ${timestamp.toLocaleString()}`;
     },
+    messageDecoder(message) {
+      // const CryptoJS = require('crypto-js');
+      // console.log(message);
+      return CryptoJS.AES.decrypt(message, this.key).toString(CryptoJS.enc.Utf8);
+    },
+    messageEncode(message) {
+      // const CryptoJS = require('crypto-js');
+      return CryptoJS.AES.encrypt(message, this.key).toString();
+    }
     messageDecoder(message) {
       // const CryptoJS = require('crypto-js');
       // console.log(message);
@@ -118,6 +143,8 @@ export default {
   },
   mounted() {
     // 在这里获取历史消息
+    if(this.cuSessionId == '') return;
+    console.log(this.cuSessionId)
     if(this.cuSessionId == '') return;
     console.log(this.cuSessionId)
     axios({

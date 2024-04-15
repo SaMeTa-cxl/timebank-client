@@ -39,6 +39,8 @@ export default {
       this.tasks = response.data.taskArray;
     }).catch( err => {
       console.log(err);
+    }).catch( err => {
+      console.log(err);
     })
   }
 }
