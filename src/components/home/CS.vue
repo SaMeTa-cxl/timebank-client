@@ -37,13 +37,11 @@
 import ICC from './components/ICC.vue';
 import MA from './components/MA.vue';
 import FP from './components/FP.vue';
-import ROPF from './components/ROPF.vue';
 
 export default {
   name: 'CS',
   components: {
     FP,
-    ROPF,
     ICC,
     MA
   },
@@ -115,7 +113,6 @@ export default {
       this.cuSessionId = data.msg[0].senderSessionId;
     },
     handleReceiveFeedback(data) {
-      if(!data['msg']) return;
       let newMessage = data['msg'];
       this.cuSessionId = data.msg.senderSessionId;
       //如果当前在FP中，则直接将该消息标记为已读后加入feedback,并向websocket发送“已经读取”消息，否则将新消息直接加入feedback
@@ -132,12 +129,11 @@ export default {
         this.feedback.push(newMessage);
     },
     handleUnreadMsg(data) {
-      if(!data['msg']) return;
+      if(data['msg'] == null) return;
       this.msg = this.msg.concat(data['msg']);
       console.log(this.msg);
     },
     handleReceiveMsg(data) {
-      if(!data['msg']) return;
       let newMessage = data['msg'];
       //如果当前在ICC中，则直接将该消息标记为已读后加入msg,并向websocket发送“已经读取”消息，否则将新消息直接加入msg
       if(this.currentComponent === 'ICC') {

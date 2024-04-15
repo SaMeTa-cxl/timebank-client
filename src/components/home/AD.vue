@@ -40,11 +40,8 @@ import CSM from './components/CSM.vue'
 import ICC from './components/ICC.vue'
 import MA from './components/MA.vue'
 import SOPA from './components/SOPA.vue'
-import SOPT from './components/SOPT.vue'
-import SOPF from './components/SOPF.vue'
 import TAM from './components/TAM.vue'
 import TCM from './components/TCM.vue'
-import TRM from './components/TRM.vue'
 // import axios from 'axios'
 
 
@@ -58,11 +55,8 @@ export default {
     ICC,
     MA,
     SOPA,
-    SOPT,
-    SOPF,
     TAM,
     TCM,
-    TRM
   },
   computed: {
     //计算未读消息的数量
@@ -83,7 +77,7 @@ export default {
     // 请求账号信息
     // axios({
     //   method: 'post',
-    //   url: 'http://172.26.58.27:8081/demo/adAccount/get',
+    //   url: 'https://mock.apifox.com/m1/4316049-3958895-default/adAccount/get',
     //   data: JSON.stringify({
     //     token: localStorage.getItem('token')
     //   })

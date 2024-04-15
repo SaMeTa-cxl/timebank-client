@@ -122,7 +122,7 @@ export default {
     console.log(this.cuSessionId)
     axios({
       method: 'post',
-      url: 'http://172.26.58.27:8081/demo/feedback/history',
+      url: 'https://mock.apifox.com/m1/4316049-3958895-default/feedback/history',
       data: JSON.stringify({
         token: localStorage.getItem('token'),
         cuSessionId: this.cuSessionId,

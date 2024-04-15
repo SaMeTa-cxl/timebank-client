@@ -37,7 +37,7 @@ export default {
 
       axios({
         method: 'post',
-        url: 'http://172.26.58.27:8081/demo/taskReview/review',
+        url: 'https://mock.apifox.com/m1/4316049-3958895-default/taskReview/review',
         data: JSON.stringify({
           token: localStorage.getItem('token'),
           task_id: id,
@@ -79,7 +79,7 @@ export default {
       if (flag) {
         axios({
           method: 'post',
-          url: 'http://172.26.58.27:8081/demo/taskReview/review',
+          url: 'https://mock.apifox.com/m1/4316049-3958895-default/taskReview/review',
           data: JSON.stringify({
             token: localStorage.getItem('token'),
             task_id: id,
@@ -103,7 +103,7 @@ export default {
   created() {
     axios({
       method: 'post',
-      url: 'http://172.26.58.27:8081/demo/taskReview/get',
+      url: 'https://mock.apifox.com/m1/4316049-3958895-default/taskReview/get',
       data: JSON.stringify({token: localStorage.getItem('token')})
     }).then( response => {
       this.taskArray = response.data.taskArray;

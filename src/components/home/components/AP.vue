@@ -79,7 +79,7 @@ export default {
         if (valid) {
           axios({
             method: 'post',
-            url: 'http://172.26.58.27:8081/demo/notice/publish',
+            url: 'https://mock.apifox.com/m1/4316049-3958895-default/notice/publish',
             data: JSON.stringify({
               token: localStorage.getItem('token'),
               ...this.announcementForm
@@ -88,7 +88,7 @@ export default {
             this.$message.success('发布成功');
             axios({
               method: 'post',
-              url: 'http://172.26.58.27:8081/demo/notice/get',
+              url: 'https://mock.apifox.com/m1/4316049-3958895-default/notice/get',
               data: JSON.stringify({token: localStorage.getItem('token')}),
             }).then( response => {
               this.announcements = response.data['noticeArray'];
@@ -104,7 +104,7 @@ export default {
           this.dialogVisible = false;
           axios({
             method: 'post',
-            url: 'http://172.26.58.27:8081/demo/notice/get',
+            url: 'https://mock.apifox.com/m1/4316049-3958895-default/notice/get',
             data: JSON.stringify({token: localStorage.getItem('token')}),
           }).then( response => {
             this.announcements = response.data['noticeArray'];
@@ -119,7 +119,7 @@ export default {
     deleteAnnouncement(announcement) {
       axios({
         method: 'post',
-        url: 'http://172.26.58.27:8081/demo/notice/delete',
+        url: 'https://mock.apifox.com/m1/4316049-3958895-default/notice/delete',
         data: JSON.stringify({
           token: localStorage.getItem('token'),
           notice_id: announcement.id
@@ -137,7 +137,7 @@ export default {
   created() {
     axios({
       method: 'post',
-      url: 'http://172.26.58.27:8081/demo/notice/get',
+      url: 'https://mock.apifox.com/m1/4316049-3958895-default/notice/get',
       data: JSON.stringify({token: localStorage.getItem('token')}),
     }).then( response => {
       this.announcements = response.data['noticeArray'];

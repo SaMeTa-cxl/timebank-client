@@ -22,7 +22,7 @@ export default {
     console.log("chart!");
     await axios({
       method: 'post',
-      url: 'http://172.26.58.27:8081/demo/coin/getStatistic',
+      url: 'https://mock.apifox.com/m1/4316049-3958895-default/coin/getStatistic',
       data: JSON.stringify({token: localStorage.getItem('token')})
     }).then( response => {
       this.totalCoins = response.data.coinSum;
@@ -86,7 +86,7 @@ export default {
       if (flag) {
         axios({
           method: 'post',
-          url: 'http://172.26.58.27:8081/demo/coin/issue',
+          url: 'https://mock.apifox.com/m1/4316049-3958895-default/coin/issue',
           data: JSON.stringify({
             token: localStorage.getItem('token'),
             coinNum: coinCount

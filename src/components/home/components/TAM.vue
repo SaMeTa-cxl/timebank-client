@@ -106,7 +106,7 @@ export default {
         for (let key in this.statusMap) 
           axios({
             method: 'post',
-            url: 'http://172.26.58.27:8081/demo/taskMonitor/select',
+            url: 'https://mock.apifox.com/m1/4316049-3958895-default/taskMonitor/select',
             data: JSON.stringify({
               token: localStorage.getItem('token'),
               status: key,
