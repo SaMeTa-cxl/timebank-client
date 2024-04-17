@@ -1,6 +1,9 @@
 <template>
   <div class="ad-container">
-    <div class="ad-header">欢迎管理员</div>
+    <div class="ad-header">
+      欢迎管理员
+      <el-button @click="onQuit">退出</el-button>
+    </div>
     <div class="ad-content">
       <el-row>
         <el-col :span="5">
@@ -19,13 +22,12 @@
               <el-menu-item index="TRM">流量监控</el-menu-item>
               <el-menu-item index="SOPA">往期审核汇总</el-menu-item>
               <el-menu-item index="MA" role="AD">我的账号</el-menu-item>
-              <el-menu-item index="MA" role="AD">我的账号</el-menu-item>
             </el-menu>
           </div>
         </el-col>
         <el-col :span="18">
           <div class="ad-main">
-            <component :is="currentComponent" :msg="msg" :socket="socket" :mySessionId="mySessionId" @updateMsg="msg.push($event)"></component>
+            <component :is="currentComponent" :msg="msg" :socket="socket" :mySessionId="mySessionId" :avatar="avatar" @updateMsg="msg.push($event)"></component>
           </div>
         </el-col>
       </el-row>
@@ -43,7 +45,7 @@ import MA from './components/MA.vue'
 import SOPA from './components/SOPA.vue'
 import TAM from './components/TAM.vue'
 import TCM from './components/TCM.vue'
-// import axios from 'axios'
+import axios from 'axios'
 
 
 export default {
@@ -72,26 +74,32 @@ export default {
       msg: [],
       socket: null,
       mySessionId: '',
+      avatar: 'http://dummyimage.com/400x400',
     }
   },
   created() {
+    // 如果没有token或者role不符合，返回登录界面
+    if(!localStorage.getItem('token') || localStorage.getItem('role') != 'AD') {
+      this.$router.push('/');
+      localStorage.removeItem('token');
+      return;
+    }
+
     // 请求账号信息
-    // axios({
-    //   method: 'post',
-    //   url: 'https://mock.apifox.com/m1/4316049-3958895-default/adAccount/get',
-    //   data: JSON.stringify({
-    //     token: localStorage.getItem('token')
-    //   })
-    // }).then(response => {
-      // this.mySessionId = 'AD' + '_' + response.data['id'];
-      this.mySessionId = 'AD_3';
+    axios({
+      method: 'post',
+      url: 'http://8.138.119.85:8080/demo_war/adAccount/get',
+      data: JSON.stringify({
+        token: localStorage.getItem('token')
+      })
+    }).then(response => {
+      this.mySessionId = 'AD' + '_' + response.data['id'];
       console.log("mySessionId:", this.mySessionId)
 
       // 登陆成功后，建立websocket连接，获取未读消息，显示小红点
-      // 登陆成功后，建立websocket连接，获取未读消息，显示小红点
       // 创建WebSocket连接
       console.log(this.mySessionId)
-      this.socket = new WebSocket(`ws:172.26.58.27:8081/demo/test?sessionId=${this.mySessionId}`);
+      this.socket = new WebSocket(`ws:8.138.119.85:8080/demo_war/test?sessionId=${this.mySessionId}`);
 
       // 监听WebSocket事件
       this.socket.onopen = () => {
@@ -114,16 +122,11 @@ export default {
       this.socket.onclose = () => {
         console.log('WebSocket closed');
       };
-    // }).catch(err => {
-    //   console.log(err);
-    //   this.$router.push('/');
-    //   localStorage.removeItem('token');
-    // })
-    // }).catch(err => {
-    //   console.log(err);
-    //   this.$router.push('/');
-    //   localStorage.removeItem('token');
-    // })
+    }).catch(err => {
+      console.log(err);
+      this.$router.push('/');
+      localStorage.removeItem('token');
+    })
   },
   beforeDestroy() {
     if(this.socket)
@@ -132,11 +135,11 @@ export default {
       this.socket.close();
   },  
   methods:{
+    onQuit() {
+      this.$router.push('/');
+      localStorage.removeItem('token');
+    },
     handleUnreadMsg(data) {
-      console.log(data['msg']);
-      if(data['msg'] != null)
-        this.msg = this.msg.concat(data['msg']);
-      console.log(data['msg']);
       if(data['msg'] != null)
         this.msg = this.msg.concat(data['msg']);
       console.log(this.msg);
@@ -166,20 +169,12 @@ export default {
      //构建发送信息的结构
       let readMsgId = this.msg.filter(obj => !obj.isRead).map(obj => obj.id);
       
-      let readMsgId = this.msg.filter(obj => !obj.isRead).map(obj => obj.id);
-      
       const sendMsg = {
         token : localStorage.getItem('token'),
         type : 'chatIsRead',
         id : readMsgId,
-        id : readMsgId,
       }
 
-      console.log(readMsgId.length, this.msg.length)
-      if(readMsgId.length != 0) {
-        //用websocket发送
-        this.socket.send(JSON.stringify(sendMsg));
-      }
       console.log(readMsgId.length, this.msg.length)
       if(readMsgId.length != 0) {
         //用websocket发送

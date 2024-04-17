@@ -1,6 +1,9 @@
 <template>
   <div class="ad-container">
-    <div class="ad-header">欢迎客服</div>
+    <div class="ad-header">
+      欢迎客服
+      <el-button @click="onQuit">退出</el-button>
+    </div>
     <div class="ad-content">
       <el-row>
         <el-col :span="5">
@@ -22,9 +25,12 @@
           <div class="ad-main">
             <component 
               :is="currentComponent" :msg="msg" :socket="socket" role="CS" :feedback="feedback"
-              :mySessionId="mySessionId" :cuSessionId="cuSessionId"
+              :mySessionId="mySessionId"
+              :name="name" :avatar="avatar"
+              :key="componentKey"
               @updateMsg="msg.push($event)"
-              @updateFeedback="feedback.push($event)">
+              @updateFeedback="onUpdateFeedback($event)"
+              @refresh="refreshComponent()">
             </component>
           </div>
         </el-col>
@@ -37,6 +43,7 @@
 import ICC from './components/ICC.vue';
 import MA from './components/MA.vue';
 import FP from './components/FP.vue';
+import axios from 'axios';
 
 export default {
   name: 'CS',
@@ -49,10 +56,6 @@ export default {
     //计算未读消息的数量
     unreadMessagesCount() {
       return this.msg.filter(item => !item.isRead).length;
-    },
-    //计算未读反馈的数量
-    unreadFeedbackCount() {
-      return this.feedback.filter(item => !item.isRead).length;
     }
   },
   data () {
@@ -60,74 +63,158 @@ export default {
       defaultActive: '',
       currentComponent: '',
       msg: [],
-      feedback: [],
+      feedback: {},
       socket: null,
       connected: false,
       mySessionId: '',
-      cuSessionId: '',
+      name: '',
+      avatar: '',
+      unreadFeedbackCount: 0,
+      componentKey: new Date().getTime()
     }
   },
-  created() {
-    // this.connectToHost();
-    //登陆成功后，建立websocket连接，获取未读消息，显示小红点
-    // 创建WebSocket连接
-    this.mySessionId = 'CS_6';
-    this.cuSessionId = 'CU_21';
+  async created() {
+    // 如果没有token或者role不符合，返回登录界面
+    if(!localStorage.getItem('token') || localStorage.getItem('role') != 'CS') {
+      this.$router.push('/');
+      localStorage.removeItem('token');
+      return;
+    }
 
-    this.socket = new WebSocket(`ws:172.26.58.27:8081/demo/test?sessionId=${this.mySessionId}`);
+    await axios({
+      method: 'post',
+      url: 'http://8.138.119.85:8080/demo_war/csAccount/get',
+      data: JSON.stringify({
+        token: localStorage.getItem('token')
+      })
+    }).then(response => {
+      this.mySessionId = 'CS' + '_' + response.data['id'];
+      this.name = response.data['name'];
+      this.avatar = response.data['img'];
+      console.log("myAvatar:", this.avatar)
 
-    // 监听WebSocket事件
-    this.socket.onopen = () => {
-      console.log('WebSocket connected');
-    };
+      this.socket = new WebSocket(`ws:8.138.119.85:8080/demo_war/test?sessionId=${this.mySessionId}`);
 
-    this.socket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      // console.log(data)
-      if(data['type'] === 'chat/unread') 
-        this.handleUnreadMsg(data);         /* 处理未读消息 */
-      else if(data['type'] === 'chat/receive')
-        this.handleReceiveMsg(data);           /* 处理新收到的消息 */
-      else if(data['type'] === 'feedback/unread')
-        this.handleUnreadFeedback(data);
-      else
-        this.handleReceiveFeedback(data);
-    };
+      // 监听WebSocket事件
+      this.socket.onopen = () => {
+        console.log('WebSocket connected');
+      };
 
-    this.socket.onerror = (error) => {
-      console.log('WebSocket error:', error);
-    };
+      this.socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        // console.log(data)
+        if(data['type'] === 'chat/unread') 
+          this.handleUnreadMsg(data);         /* 处理未读消息 */
+        else if(data['type'] === 'chat/receive')
+          this.handleReceiveMsg(data);           /* 处理新收到的消息 */
+        else if(data['type'] === 'feedback/unread')
+          this.handleUnreadFeedback(data.msg);
+        else
+          this.handleReceiveFeedback(data.msg);
+      };
 
-    this.socket.onclose = () => {
-      console.log('WebSocket closed');
-    };
+      this.socket.onerror = (error) => {
+        console.log('WebSocket error:', error);
+      };
+
+      this.socket.onclose = () => {
+        console.log('WebSocket closed');
+      };
+    }).catch(err => {
+      console.log(err);
+      this.$router.push('/');
+      localStorage.removeItem('token');
+    });
+
+    axios({
+      method: 'post',
+      url:'http://8.138.119.85:8080/demo_war/feedback/getId2',
+      data: JSON.stringify({token: localStorage.getItem('token')})
+    }).then( response => {
+      if(response.data.status) {
+        console.log(response.data.ids)
+        for(let i = 0; i < response.data.ids.length; i++) {
+          console.log("建立连接的用户编号：",response.data.ids[i]);
+          let cuSessionId = 'CU_' + response.data.ids[i];
+          this.feedback[cuSessionId] = [];
+
+          // 查看是否有历史消息，没有则删除该用户
+          axios({
+            method: 'post',
+            url: 'http://8.138.119.85:8080/demo_war/feedback/history',
+            data: JSON.stringify({
+              token: localStorage.getItem('token'),
+              cuSessionId: cuSessionId,
+              csSessionId: this.mySessionId
+            })
+          }).then( response => {
+            if(!response.data.msg.length) {
+              delete this.feedback[cuSessionId];
+              // console.log("delete feedback:",this.feedback);
+              return;
+            }
+            console.log(`与${cuSessionId}的聊天记录：`,response.data.msg);
+          }).catch(() => {
+            this.$router.push('/');
+            localStorage.removeItem('token');
+          });
+        }
+      }
+    })
   },
   beforeDestroy() {
     this.socket.close();
   },  
   methods:{
-    handleUnreadFeedback(data) {
-      if(data['msg'].length == 0) return;
-      this.feedback = this.feedback.concat(data['msg']);
-      // console.log(data.msg)
-      this.cuSessionId = data.msg[0].senderSessionId;
+    refreshComponent() {
+      console.log('refresh component');
+      this.componentKey = new Date().getTime();
     },
-    handleReceiveFeedback(data) {
-      if(!data['msg']) return;
-      let newMessage = data['msg'];
-      this.cuSessionId = data.msg.senderSessionId;
+    onUpdateFeedback(newFeedback) {
+      console.log("update new feedback:", newFeedback);
+      console.log('before adding, feedback:', this.feedback);
+      this.feedback[newFeedback.receiverSessionId].push(newFeedback);
+      console.log('after adding, feedback:', this.feedback);
+    },
+    onQuit() {
+      this.$router.push('/');
+      localStorage.removeItem('token');
+    },
+    handleUnreadFeedback(msg) {
+      console.log('handleUnreadFeedback');
+      console.log(msg);
+      if(msg.length == 0) return;
+      msg.forEach(el => {
+        this.feedback[el.senderSessionId].push(el);        
+      });
+
+      //维护未读反馈数量
+      for(let key in this.feedback) {
+        this.unreadFeedbackCount += this.feedback[key].filter(item => !item.isRead).length;
+      }
+      // console.log(this.feedback)
+    },
+    handleReceiveFeedback(msg) {
+      console.log('handleReceivedFeedback');
+      if(!msg) return;
       //如果当前在FP中，则直接将该消息标记为已读后加入feedback,并向websocket发送“已经读取”消息，否则将新消息直接加入feedback
       if(this.currentComponent === 'FP') {
-        newMessage.isRead = true;
-        console.log(newMessage);
-        this.feedback.push(newMessage);
+        msg.isRead = true;
+        console.log("msg:", msg.senderSessionId);
+        console.log("feedback:", this.feedback);
+        this.feedback[msg.senderSessionId].push(msg); 
         this.socket.send(JSON.stringify({
           token : localStorage.getItem('token'),
           type : 'feedbackIsRead',
-          id : [newMessage.id],
+          id : [msg.id],
         }));
-      } else 
-        this.feedback.push(newMessage);
+        
+      } else {
+        this.feedback[msg.senderSessionId].push(msg); 
+        this.unreadFeedbackCount++;
+      }
+      this.refreshComponent();
+      console.log(this.feedback);
     },
     handleUnreadMsg(data) {
       if(data['msg'] == null) return;
@@ -175,8 +262,16 @@ export default {
       /*
         发送消息给后端，表示消息已读
       */
+     // 获取所有未读消息的id数组
+      let readFeedbackId = [];
+      for(let key in this.feedback) {
+        readFeedbackId = readFeedbackId.concat(this.feedback[key].filter(el => !el.isRead).map(el => el.id))
+      }
+      console.log(readFeedbackId);
 
-      let readFeedbackId = this.feedback.filter(obj => !obj.isRead).map(obj => obj.id);
+      // 将未读消息数量清零
+      this.unreadFeedbackCount = 0;
+
       const sendMsg = {
         token : localStorage.getItem('token'),
         type : 'feedbackIsRead',
@@ -184,51 +279,16 @@ export default {
       }
 
       if(readFeedbackId.length == 0) return;
+      console.log("send:", sendMsg);
 
       //用websocket发送
       this.socket.send(JSON.stringify(sendMsg));
 
       //将msg中所有的消息的isRead字段改成true
-      this.feedback = this.feedback.map(item => ({...item, isRead : true}));
-    
+      for(let key in this.feedback) {
+        this.feedback[key] = this.feedback[key].map(item => ({...item, isRead: true}));
+      }
     },
-    connectToHost() {
-      if(this.connected) return;
-      //登陆成功后，建立websocket连接，获取未读消息，显示小红点
-      // 创建WebSocket连接
-      this.socket = new WebSocket('ws://localhost:8081/');
-
-      // 监听WebSocket事件
-      this.socket.onopen = () => {
-        console.log('WebSocket connected');
-        this.connected = true;
-      };
-
-      this.socket.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        // console.log(data)
-        if(data['type'] === 'chat/unread') 
-          this.handleUnreadMsg(data);         /* 处理未读消息 */
-        else if(data['type'] === 'chat/receive')
-          this.handleReceiveMsg(data);           /* 处理新收到的消息 */
-        else if(data['type'] === 'feedback/unread')
-          this.handleUnreadFeedback(data);
-        else
-          this.handleReceiveFeedback(data);
-      };
-
-      this.socket.onerror = (error) => {
-        console.log('WebSocket error:', error);
-        this.connected = false;
-        this.connectToHost();
-      };
-
-      this.socket.onclose = () => {
-        console.log('WebSocket closed');
-        this.connected = false;
-        this.connectToHost();
-      };
-    }
   }
 }
 </script>

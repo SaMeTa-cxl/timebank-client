@@ -46,7 +46,7 @@ import axios from 'axios';
 
 export default {
   name: 'ICC',
-  props: ['msg', 'socket', 'mySessionId'],
+  props: ['msg', 'socket', 'mySessionId', 'avatar'],
   data() {
     return {
       chatRoomName: '内部交流通道',
@@ -54,7 +54,7 @@ export default {
       showHistoryMessages: false,
       historyMessages: [],
       newMessage: '',
-      key: 'abc'
+      key: 'abc',
     };
   },
   methods: {
@@ -113,11 +113,13 @@ export default {
     // 在这里获取历史消息
     axios({
       method: 'post',
-      url: 'https://mock.apifox.com/m1/4316049-3958895-default/chat/history',
+      url: 'http://8.138.119.85:8080/demo_war/chat/history',
       data: JSON.stringify({token: localStorage.getItem('token')}),
     }).then( (response) => {
+      console.log(response.data)
       this.historyMessages = response.data['msg'];
       // 使用filter方法过滤出与msg数组不同的元素,即找到真正的历史信息
+      if(this.historyMessages == null) return;
       this.historyMessages = this.historyMessages.filter(message => {
         return !this.msg.some(item => item.id === message.id && item.senderSessionId === message.senderSessionId);
       });

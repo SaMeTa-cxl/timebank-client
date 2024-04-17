@@ -149,9 +149,9 @@ export default {
 
       //三种角色的请求接口表
       let urlMap = {
-        'AD': 'https://mock.apifox.com/m1/4316049-3958895-default/adAccount/upload',
-        'AU': 'https://mock.apifox.com/m1/4316049-3958895-default/auAccount/upload',
-        'CS': 'https://mock.apifox.com/m1/4316049-3958895-default/csAccount/upload',
+        'AD': 'http://8.138.119.85:8080/demo_war/adAccount/upload',
+        'AU': 'http://8.138.119.85:8080/demo_war/auAccount/upload',
+        'CS': 'http://8.138.119.85:8080/demo_war/csAccount/upload',
       };
 
       if(this.hasChangedAvatar) {
@@ -177,9 +177,9 @@ export default {
       }
 
       urlMap = {
-        'AD': 'https://mock.apifox.com/m1/4316049-3958895-default/adAccount/set',
-        'AU': 'https://mock.apifox.com/m1/4316049-3958895-default/auAccount/set',
-        'CS': 'https://mock.apifox.com/m1/4316049-3958895-default/csAccount/set',
+        'AD': 'http://8.138.119.85:8080/demo_war/adAccount/set',
+        'AU': 'http://8.138.119.85:8080/demo_war/auAccount/set',
+        'CS': 'http://8.138.119.85:8080/demo_war/csAccount/set',
       };
       //向服务端发送其他信息的更新请求
       await axios({
@@ -187,8 +187,8 @@ export default {
         url: urlMap[localStorage.getItem('role')],
         data: JSON.stringify({
           token: localStorage.getItem('token'),
-          name: this.formData.username,
-          tel: this.formData.phoneNumber
+          name: this.formData.username == this.userInfo.username ? null : this.formData.username,
+          tel: this.formData.phoneNumber == this.userInfo.phoneNumber ? null : this.formData.phoneNumber,
         })
       }).then(response => {
         flag &&= response.data['status'];
@@ -241,9 +241,9 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           let urlMap = {
-            'AD': 'https://mock.apifox.com/m1/4316049-3958895-default/adAccount/setPwd',
-            'AU': 'https://mock.apifox.com/m1/4316049-3958895-default/auAccount/setPwd',
-            'CS': 'https://mock.apifox.com/m1/4316049-3958895-default/csAccount/setPwd',
+            'AD': 'http://8.138.119.85:8080/demo_war/adAccount/setPwd',
+            'AU': 'http://8.138.119.85:8080/demo_war/auAccount/setPwd',
+            'CS': 'http://8.138.119.85:8080/demo_war/csAccount/setPwd',
           };
           //向服务端发送更新密码请求
           axios({
@@ -278,9 +278,9 @@ export default {
   },
   mounted() {
     const urlMap = {
-      'AD': 'https://mock.apifox.com/m1/4316049-3958895-default/adAccount/get',
-      'AU': 'https://mock.apifox.com/m1/4316049-3958895-default/auAccount/get',
-      'CS': 'https://mock.apifox.com/m1/4316049-3958895-default/csAccount/get',
+      'AD': 'http://8.138.119.85:8080/demo_war/adAccount/get',
+      'AU': 'http://8.138.119.85:8080/demo_war/auAccount/get',
+      'CS': 'http://8.138.119.85:8080/demo_war/csAccount/get',
     }
     // console.log(urlMap[localStorage.getItem('role')])
     //请求账号信息
@@ -294,7 +294,8 @@ export default {
       this.userInfo.phoneNumber = response.data['tel'];
       this.userInfo.userId = response.data['id'];
       this.userInfo.username = response.data['name'];
-      this.avatarUrl = response.data['img'];
+      this.avatarUrl = "http://8.138.119.85:8080/images" + response.data['img'];
+      console.log(this.avatarUrl);
     }).catch(err => {
       console.log(err);
       this.$router.push('/');

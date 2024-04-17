@@ -102,7 +102,7 @@ export default {
                 //发送更新请求
                 axios({
                     method: 'post',
-                    url: 'https://mock.apifox.com/m1/4316049-3958895-default/CUM/updateById',
+                    url: 'http://8.138.119.85:8080/demo_war/CUM/updateById',
                     data: JSON.stringify(requestData)
                 }).then(response => {
                     if(response.data['status']) {
@@ -110,8 +110,9 @@ export default {
                             message: '保存成功',
                             type: 'success'
                         });
-                        this.dialogFormVisible = false;
-                        console.log(this.dialogFormVisible)
+                        // this.dialogFormVisible = false;
+                        // console.log(this.dialogFormVisible)
+                        this.$emit('closeDialog');
                     }
                     else
                         this.$message.error('保存失败：'+response.data['msg']);
@@ -148,7 +149,7 @@ export default {
                     //发送更新请求
                     axios({
                         method: 'post',
-                        url: 'https://mock.apifox.com/m1/4316049-3958895-default/CUM/updateById',
+                        url: 'http://8.138.119.85:8080/demo_war/CUM/updateById',
                         data: JSON.stringify(requestData)
                     }).then(response => {
                         if(response.data['status'])

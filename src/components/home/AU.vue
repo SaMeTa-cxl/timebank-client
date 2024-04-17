@@ -1,6 +1,9 @@
 <template>
   <div class="ad-container">
-    <div class="ad-header">欢迎审核</div>
+    <div class="ad-header">
+      欢迎审核
+      <el-button @click="onQuit">退出</el-button>
+    </div>
     <div class="ad-content">
       <el-row>
         <el-col :span="5">
@@ -31,7 +34,7 @@ import AROPT from './components/AROPT.vue';
 import ICC from './components/ICC.vue'
 import TR from './components/TR.vue';
 import MA from './components/MA.vue';
-// import axios from 'axios'
+import axios from 'axios'
 
 export default {
   name: 'AU',
@@ -57,21 +60,27 @@ export default {
     }
   },
   created() {
+    // 如果没有token或者role不符合，返回登录界面
+    if(!localStorage.getItem('token') || localStorage.getItem('role') != 'AU') {
+      this.$router.push('/');
+      localStorage.removeItem('token');
+      return;
+    }
+
     // 请求账号信息
-    // axios({
-    //   method: 'post',
-    //   url: 'https://mock.apifox.com/m1/4316049-3958895-default/auAccount/get',
-    //   data: JSON.stringify({
-    //     token: localStorage.getItem('token')
-    //   })
-    // }).then(response => {
-      // this.mySessionId = 'AU' + '_' + response.data['id'];
-      this.mySessionId = 'AU_5';
+    axios({
+      method: 'post',
+      url: 'http://8.138.119.85:8080/demo_war/auAccount/get',
+      data: JSON.stringify({
+        token: localStorage.getItem('token')
+      })
+    }).then(response => {
+      this.mySessionId = 'AU' + '_' + response.data['id'];
 
       // 登陆成功后，建立websocket连接，获取未读消息，显示小红点
       // 创建WebSocket连接
       console.log(this.mySessionId)
-      this.socket = new WebSocket(`ws:172.26.58.27:8081/demo/test?sessionId=${this.mySessionId}`);
+      this.socket = new WebSocket(`ws:8.138.119.85:8080/demo_war/test?sessionId=${this.mySessionId}`);
 
       // 监听WebSocket事件
       this.socket.onopen = () => {
@@ -94,17 +103,21 @@ export default {
       this.socket.onclose = () => {
         console.log('WebSocket closed');
       };
-    // }).catch(err => {
-    //   console.log(err);
-    //   this.$router.push('/');
-    //   localStorage.removeItem('token');
-    // })
+    }).catch(err => {
+      console.log(err);
+      this.$router.push('/');
+      localStorage.removeItem('token');
+    })
   },
   beforeDestroy() {
     if(this.socket)
       this.socket.close();
   },  
   methods:{
+    onQuit() {
+      this.$router.push('/');
+      localStorage.removeItem('token');
+    },
     handleUnreadMsg(data) {
       if(data['msg'] != null)
         this.msg = this.msg.concat(data['msg']);

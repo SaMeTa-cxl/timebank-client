@@ -74,7 +74,7 @@
         width="150"
         align="center">
         <template slot-scope="scope">
-          <el-avatar :size="50" :src="scope.row.img"></el-avatar>
+          <el-avatar :size="50" :src="'http://8.138.119.85:8080/images'+scope.row.img"></el-avatar>
         </template>
       </el-table-column>
       <el-table-column 
@@ -102,19 +102,23 @@
       <el-button type="danger" round v-if="multiSelectMode" @click="onMultiDelete">删除</el-button>
     </div>
     <CsFormDialog v-if="isEditDialogVisble" :details="details" @closeDialog="isEditDialogVisble = false" @updateData="onUpdateData($event)"></CsFormDialog>
-    <cs-add-form-dialog v-if="isAddDialogVisible" @closeDialog="isAddDialogVisible = false"></cs-add-form-dialog>
+    <usr-add-form-dialog 
+      v-if="isAddDialogVisible"
+      role="CS" 
+      @updateUserArray="onUpdateUserArray($event)" @closeDialog="isAddDialogVisible = false">
+    </usr-add-form-dialog>
   </div>
 </template>
 <script>
 import axios from 'axios';
 import SearchLine from './SearchLine.vue';
 import CsFormDialog from './CsFormDialog.vue';
-import CsAddFormDialog from './CsAddFormDialog.vue';
+import UsrAddFormDialog from './UsrAddFormDialog.vue';
 export default {
   components: {
     SearchLine,
     CsFormDialog,
-    CsAddFormDialog
+    UsrAddFormDialog
   },
   name: 'CSM',
   data() {
@@ -165,7 +169,7 @@ export default {
       onChange(e, index) {
         axios({
           method: 'post',
-          url: 'https://mock.apifox.com/m1/4316049-3958895-default/common/statusSet',
+          url: 'http://8.138.119.85:8080/demo_war/common/statusSet',
           data: JSON.stringify({
             role: 'CS',
             status: e,
@@ -194,7 +198,7 @@ export default {
       onResetPswd(id) {
         axios({
           method: 'post',
-          url: 'https://mock.apifox.com/m1/4316049-3958895-default/common/passwordReset',
+          url: 'http://8.138.119.85:8080/demo_war/common/passwordReset',
           data: JSON.stringify({
             role: 'CS',
             id: id,
@@ -234,7 +238,7 @@ export default {
         }).then(() => {
           axios({
             method: 'post',
-            url: 'https://mock.apifox.com/m1/4316049-3958895-default/common/delete',
+            url: 'http://8.138.119.85:8080/demo_war/common/delete',
             data: JSON.stringify(deleteData)
           }).then(response => {
             if(response.data['status']) {
@@ -271,7 +275,7 @@ export default {
         }).then(() => {
           axios({
             method: 'post',
-            url: 'https://mock.apifox.com/m1/4316049-3958895-default/common/delete',
+            url: 'http://8.138.119.85:8080/demo_war/common/delete',
             data: JSON.stringify(deleteData)
           }).then(response => {
               if(response.data['status']) {
@@ -304,7 +308,7 @@ export default {
         };
         axios({
           method: 'post',
-          url: 'https://mock.apifox.com/m1/4316049-3958895-default/CSM/selectById',
+          url: 'http://8.138.119.85:8080/demo_war/CSM/selectById',
           data: JSON.stringify(requestData)
         }).then(response => {
             if(response.data['status']) {
@@ -335,6 +339,10 @@ export default {
             this.userArray[this.selectedIndex][key] = updatedUser[key];
         }
         console.log(this.userArray[this.selectedIndex]); 
+      },
+      onUpdateUserArray(newUserArray) {
+        this.isAddDialogVisible = false;
+        this.userArray = newUserArray;
       }
     },
     created() {
@@ -352,7 +360,7 @@ export default {
       }
       axios({
         method: 'post',
-        url: 'https://mock.apifox.com/m1/4316049-3958895-default/common/select',
+        url: 'http://8.138.119.85:8080/demo_war/common/select',
         data: JSON.stringify(searchForm)
       }).then( (response) => {
         this.userArray = response.data['userArray'];

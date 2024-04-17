@@ -27,7 +27,7 @@
       <h3>{{ announcement.notice_title }}</h3>
       <p>{{ announcement.notice_content }}</p>
       <p>发布时间：{{ new Date(announcement.notice_time).toLocaleString() }}</p>
-      <el-button type="text" @click="deleteAnnouncement(announcement)">删除</el-button>
+      <el-button type="text" @click="deleteAnnouncement(announcement.notice_id)">删除</el-button>
     </div>
   </div>
 </template>
@@ -79,7 +79,7 @@ export default {
         if (valid) {
           axios({
             method: 'post',
-            url: 'https://mock.apifox.com/m1/4316049-3958895-default/notice/publish',
+            url: 'http://8.138.119.85:8080/demo_war/notice/publish',
             data: JSON.stringify({
               token: localStorage.getItem('token'),
               ...this.announcementForm
@@ -88,7 +88,7 @@ export default {
             this.$message.success('发布成功');
             axios({
               method: 'post',
-              url: 'https://mock.apifox.com/m1/4316049-3958895-default/notice/get',
+              url: 'http://8.138.119.85:8080/demo_war/notice/get',
               data: JSON.stringify({token: localStorage.getItem('token')}),
             }).then( response => {
               this.announcements = response.data['noticeArray'];
@@ -104,7 +104,7 @@ export default {
           this.dialogVisible = false;
           axios({
             method: 'post',
-            url: 'https://mock.apifox.com/m1/4316049-3958895-default/notice/get',
+            url: 'http://8.138.119.85:8080/demo_war/notice/get',
             data: JSON.stringify({token: localStorage.getItem('token')}),
           }).then( response => {
             this.announcements = response.data['noticeArray'];
@@ -116,17 +116,17 @@ export default {
         }
       });
     },
-    deleteAnnouncement(announcement) {
+    deleteAnnouncement(id) {
       axios({
         method: 'post',
-        url: 'https://mock.apifox.com/m1/4316049-3958895-default/notice/delete',
+        url: 'http://8.138.119.85:8080/demo_war/notice/delete',
         data: JSON.stringify({
           token: localStorage.getItem('token'),
-          notice_id: announcement.id
+          notice_id: id,
         })
       }).then( () => {
         console.log(this.announcements);
-        this.announcements = this.announcements.filter( el => el.notice_id != announcement.notice_id);
+        this.announcements = this.announcements.filter( el => el.notice_id != id);
         this.$message.success('删除成功');
       }).catch( () => {
         this.$router.push('/');
@@ -137,7 +137,7 @@ export default {
   created() {
     axios({
       method: 'post',
-      url: 'https://mock.apifox.com/m1/4316049-3958895-default/notice/get',
+      url: 'http://8.138.119.85:8080/demo_war/notice/get',
       data: JSON.stringify({token: localStorage.getItem('token')}),
     }).then( response => {
       this.announcements = response.data['noticeArray'];

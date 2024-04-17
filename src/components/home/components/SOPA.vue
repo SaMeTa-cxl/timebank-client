@@ -35,7 +35,7 @@ export default {
   created() {
     axios({
       method: 'post',
-      url: 'https://mock.apifox.com/m1/4316049-3958895-default/taskReview/history',
+      url: 'http://8.138.119.85:8080/demo_war/taskReview/history',
       data: JSON.stringify({token: localStorage.getItem('token')}),
     }).then( response => {
       console.log(response.data);

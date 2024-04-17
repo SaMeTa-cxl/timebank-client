@@ -76,12 +76,14 @@
                     token : localStorage.getItem('token'),
                     name : this.formData.name == this.details.name ? null : this.details.name,
                     phone : this.formData.phone == this.details.phone ? null : this.details.phone,
-                    img : this.formData.img
+                    img : this.formData.img,
+                    id : this.formData.id,
                 };
+                console.log(requestData);
                 //发送更新请求
                 axios({
                     method: 'post',
-                    url: 'https://mock.apifox.com/m1/4316049-3958895-default/AUM/updateById',
+                    url: 'http://8.138.119.85:8080/demo_war/AUM/updateById',
                     data: JSON.stringify(requestData)
                 }).then(response => {
                     if(response.data['status'])
@@ -121,7 +123,7 @@
                     //发送更新请求
                     axios({
                         method: 'post',
-                        url: 'https://mock.apifox.com/m1/4316049-3958895-default/AUsM/updateById',
+                        url: 'http://8.138.119.85:8080/demo_war/AUM/updateById',
                         data: JSON.stringify(requestData)
                     }).then(response => {
                         if(response.data['status'])

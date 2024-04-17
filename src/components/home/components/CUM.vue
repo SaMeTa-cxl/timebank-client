@@ -74,7 +74,7 @@
         width="150"
         align="center">
         <template slot-scope="scope">
-          <el-avatar :size="50" :src="scope.row.img"></el-avatar>
+          <el-avatar :size="50" :src="'http://8.138.119.85:8080/images'+scope.row.img"></el-avatar>
         </template>
       </el-table-column>
       <el-table-column 
@@ -101,8 +101,16 @@
       <el-button type="primary" @click="onAdd" round>增添</el-button>
       <el-button type="danger" round v-if="multiSelectMode" @click="onMultiDelete">删除</el-button>
     </div>
-    <UsrFormDialog v-if="isEditDialogVisble" :details="details" @closeDialog="isEditDialogVisble = false" @updateData="onUpdateData($event)"></UsrFormDialog>
-    <usr-add-form-dialog v-if="isAddDialogVisible" @updateUserArray="userArray = $event"></usr-add-form-dialog>
+    <UsrFormDialog 
+      v-if="isEditDialogVisble" 
+      :details="details"
+      @closeDialog="isEditDialogVisble = false" @updateData="onUpdateData($event)">
+    </UsrFormDialog>
+    <usr-add-form-dialog 
+      v-if="isAddDialogVisible"
+      role="CU" 
+      @updateUserArray="onUpdateUserArray($event)" @closeDialog="isAddDialogVisible = false">
+    </usr-add-form-dialog>
   </div>
 </template>
 <script>
@@ -169,7 +177,7 @@ export default {
       onChange(e, index) {
         axios({
           method: 'post',
-          url: 'https://mock.apifox.com/m1/4316049-3958895-default/common/statusSet',
+          url: 'http://8.138.119.85:8080/demo_war/common/statusSet',
           data: JSON.stringify({
             role: 'CU',
             status: e,
@@ -204,7 +212,7 @@ export default {
           })
         axios({
           method: 'post',
-          url: 'https://mock.apifox.com/m1/4316049-3958895-default/common/passwordReset',
+          url: 'http://8.138.119.85:8080/demo_war/common/passwordReset',
           data: JSON.stringify({
             role: 'CU',
             id: id,
@@ -244,7 +252,7 @@ export default {
         }).then(() => {
           axios({
             method: 'post',
-            url: 'https://mock.apifox.com/m1/4316049-3958895-default/common/delete',
+            url: 'http://8.138.119.85:8080/demo_war/common/delete',
             data: JSON.stringify(deleteData)
           }).then(response => {
               if(response.data['status']) {
@@ -281,7 +289,7 @@ export default {
         }).then(() => {
           axios({
             method: 'post',
-            url: 'https://mock.apifox.com/m1/4316049-3958895-default/common/delete',
+            url: 'http://8.138.119.85:8080/demo_war/common/delete',
             data: JSON.stringify(deleteData)
           }).then(response => {
               if(response.data['status']) {
@@ -314,7 +322,7 @@ export default {
         };
         axios({
           method: 'post',
-          url: 'https://mock.apifox.com/m1/4316049-3958895-default/CUM/selectById',
+          url: 'http://8.138.119.85:8080/demo_war/CUM/selectById',
           data: JSON.stringify(requestData)
         }).then(response => {
             //成功回调函数，获取返回的数据，和userarray中的数据合并
@@ -349,6 +357,10 @@ export default {
         }
         console.log(this.userArray[this.selectedIndex]); 
       },
+      onUpdateUserArray(newUserArray) {
+        this.isAddDialogVisible = false;
+        this.userArray = newUserArray;
+      }
     },
     created() {
       let searchForm = {
@@ -365,7 +377,7 @@ export default {
       }
       axios({
         method: 'post',
-        url: 'https://mock.apifox.com/m1/4316049-3958895-default/common/select',
+        url: 'http://8.138.119.85:8080/demo_war/common/select',
         data: JSON.stringify(searchForm)
       }).then( (response) => {
         console.log(response.data)

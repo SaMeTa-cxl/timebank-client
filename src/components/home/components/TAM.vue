@@ -106,7 +106,7 @@ export default {
         for (let key in this.statusMap) 
           axios({
             method: 'post',
-            url: 'https://mock.apifox.com/m1/4316049-3958895-default/taskMonitor/select',
+            url: 'http://8.138.119.85:8080/demo_war/taskMonitor/select',
             data: JSON.stringify({
               token: localStorage.getItem('token'),
               status: key,
@@ -128,7 +128,7 @@ export default {
         for(let item in status) {
           axios({
             method: 'post',
-            url: 'https://mock.apifox.com/m1/4316049-3958895-default/taskMonitor/select',
+            url: 'http://8.138.119.85:8080/demo_war/taskMonitor/select',
             data: JSON.stringify({
               token: localStorage.getItem('token'),
               status: item,
@@ -146,7 +146,7 @@ export default {
       }
       axios({
         method: 'post',
-        url: 'https://mock.apifox.com/m1/4316049-3958895-default/taskMonitor/select',
+        url: 'http://8.138.119.85:8080/demo_war/taskMonitor/select',
         data: JSON.stringify({
           token: localStorage.getItem('token'),
           status: status,
@@ -165,7 +165,7 @@ export default {
     console.log('mounted')
     axios({
       method: 'post',
-      url: 'https://mock.apifox.com/m1/4316049-3958895-default/taskMonitor/info',
+      url: 'http://8.138.119.85:8080/demo_war/taskMonitor/info',
       data: JSON.stringify({token: localStorage.getItem('token')}),
     }).then( response => {
       this.taskCount.toReview = response.data.task_num1;
@@ -180,7 +180,7 @@ export default {
     for (let key in this.statusMap) 
       axios({
         method: 'post',
-        url: 'https://mock.apifox.com/m1/4316049-3958895-default/taskMonitor/select',
+        url: 'http://8.138.119.85:8080/demo_war/taskMonitor/select',
         data: JSON.stringify({
           token: localStorage.getItem('token'),
           status: key,
