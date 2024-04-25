@@ -1,14 +1,22 @@
 <template>
-    <div>
-        <el-form :inline="true" :model="searchForm">
-            <el-form-item label="用户编号">
-                <el-input v-model="searchForm.id" placeholder="用户编号"></el-input>
+    <div class="search-line">
+        <el-form :inline="true" :model="searchForm" style="width: 100%; " ref="form">
+            <el-form-item label="用户编号" prop="id">
+                <el-input v-model="searchForm.id" placeholder="用户编号" style="width: 500px"></el-input>
             </el-form-item>
-            <el-form-item label="用户名">
-                <el-input v-model="searchForm.name" placeholder="用户名"></el-input>
+            <el-form-item label="用户名" prop="name">
+                <el-input v-model="searchForm.name" placeholder="用户名" style="width: 500px;"></el-input>
             </el-form-item>
-            <el-form-item label="注册时间">
+            
+            <el-form-item label="用户状态" prop="userStatus">
+                <el-radio-group v-model="searchForm.userStatus" style="width: 200px">
+                    <el-radio-button v-model="searchForm.userStatus" :label=true>正常</el-radio-button>
+                    <el-radio-button v-model="searchForm.userStatus" :label=false>禁用</el-radio-button>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item label="注册时间" prop="register">
                 <el-date-picker
+                    style="width: 500px"
                     v-model="searchForm.register"
                     type="datetimerange"
                     :picker-options="pickerOptions"
@@ -18,10 +26,9 @@
                     align="right">
                 </el-date-picker>
             </el-form-item>
-        </el-form>
-        <el-form :inline="true" :model="searchForm">
-            <el-form-item label="登录时间">
+            <el-form-item label="登录时间" prop="login">
                 <el-date-picker
+                    style="width: 500px"
                     v-model="searchForm.login"
                     type="datetimerange"
                     :picker-options="pickerOptions"
@@ -31,14 +38,11 @@
                     align="right">
                 </el-date-picker>
             </el-form-item>
-            <el-form-item label="用户状态">
-                <el-radio-group v-model="searchForm.userStatus">
-                    <el-radio-button v-model="searchForm.userStatus" :label=true>正常</el-radio-button>
-                    <el-radio-button v-model="searchForm.userStatus" :label=false>禁用</el-radio-button>
-                </el-radio-group>
+            <el-form-item>
+                <el-button type="primary" @click="handleSearch" style="margin-left: 50px;">查询</el-button>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" @click="handleSearch">查询</el-button>
+                <el-button type="primary" @click="onReset()" >重置</el-button>
             </el-form-item>
         </el-form>
     </div>
@@ -90,6 +94,10 @@ export default {
         }
     },
     methods: {
+        onReset() {
+            this.$refs.form.resetFields();  
+            // console.log(this.$refs.form);
+        },
         handleSearch() {
             //处理日期
             let processedSearchForm = JSON.parse(JSON.stringify(this.searchForm));
@@ -143,5 +151,13 @@ export default {
 </script>
 
 <style scoped>
-
+.search-line {
+    background-color: aquamarine;
+    padding: 10px;
+    border-width: 0px;
+    border-style: solid;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1)
+}   
 </style>

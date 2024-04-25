@@ -315,7 +315,7 @@ export default {
               this.details.auditNum = response.data['auditNum'];
               this.details.id = row.id;
               this.details.name = row.name;
-              this.details.img = row.img;
+              this.details.img = 'http://8.138.119.85:8080/images' + row.img;
               this.details.phone = row.phone;
               this.details.login = row.login;
               this.details.register = row.register;

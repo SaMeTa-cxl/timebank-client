@@ -1,11 +1,18 @@
 <template>
-  <div>
-    <el-button type="primary" @click="handleNewAnnouncement">发布新公告</el-button>
+  <div class="APmain">
+    <div class="top-bar">
+      <el-button type="text" @click="handleNewAnnouncement" style="width: 100%;">
+        <span style="color: #03A3CF; font-weight: bold; font-size: 20px;">发布新公告</span>
+        <i class="el-icon-circle-plus" style="font-size: 20px;"></i>
+      </el-button>
+    </div>
     <el-dialog
       title="发布新公告"
       :visible.sync="dialogVisible"
       width="50%"
       :before-close="handleCloseDialog"
+      append-to-body="false"
+      modal-append-to-body="false"
     >
       <el-form :model="announcementForm" :rules="announcementRules" ref="announcementForm">
         <el-form-item label="标题" prop="notice_title">
@@ -23,12 +30,18 @@
     </el-dialog>
 
     <!-- 展示过往所有公告的区域 -->
-    <div v-for="announcement in announcements" :key="announcement.notice_id">
-      <h3>{{ announcement.notice_title }}</h3>
-      <p>{{ announcement.notice_content }}</p>
-      <p>发布时间：{{ new Date(announcement.notice_time).toLocaleString() }}</p>
-      <el-button type="text" @click="deleteAnnouncement(announcement.notice_id)">删除</el-button>
+    <div v-for="announcement in announcements" :key="announcement.notice_id" class="annnoucement-list">
+      <el-card class="box-card" style="margin-bottom: 10px;">
+        <div slot="header" class="clearfix">
+          <h3> {{announcement.notice_title}} </h3>
+          <el-button type="primary" style="float: right;  padding: 3px 0" @click="deleteAnnouncement(announcement.notice_id)">删除</el-button>
+        </div>
+        <p>{{ announcement.notice_content }}</p>
+        <p>发布时间：{{ new Date(announcement.notice_time).toLocaleString() }}</p>
+      </el-card>
     </div>
+
+    <el-backtop :visibility-height="200"/>
   </div>
 </template>
 
@@ -92,6 +105,7 @@ export default {
               data: JSON.stringify({token: localStorage.getItem('token')}),
             }).then( response => {
               this.announcements = response.data['noticeArray'];
+              this.$refs.announcementForm.resetFields();
             }).catch( () => {
               this.$router.push('/');
               localStorage.removeItem('token');
@@ -148,3 +162,13 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.top-bar {
+  text-align: center;
+  margin-bottom: 10px;
+  background-color: aqua;
+  border: 0px solid;
+  border-radius: 10px;
+}
+</style>

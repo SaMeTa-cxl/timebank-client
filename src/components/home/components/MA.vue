@@ -276,7 +276,7 @@ export default {
       this.$refs[formName].resetFields();
     },
   },
-  mounted() {
+  async mounted() {
     const urlMap = {
       'AD': 'http://8.138.119.85:8080/demo_war/adAccount/get',
       'AU': 'http://8.138.119.85:8080/demo_war/auAccount/get',
@@ -284,7 +284,7 @@ export default {
     }
     // console.log(urlMap[localStorage.getItem('role')])
     //请求账号信息
-    axios({
+    await axios({
       method: 'post',
       url: urlMap[localStorage.getItem('role')],
       data: JSON.stringify({

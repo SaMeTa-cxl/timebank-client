@@ -1,32 +1,29 @@
 <template>
-  <div class="ad-container">
-    <div class="ad-header">
+  <el-container>
+    <el-header :height="headerHeight" ref="header">
       欢迎审核
       <el-button @click="onQuit">退出</el-button>
-    </div>
-    <div class="ad-content">
-      <el-row>
-        <el-col :span="5">
-          <div class="ad-sidebar">
-            <el-menu :default-active="defaultActive" class="el-menu-vertical-demo" @select="handleMenuSelect">
-              <el-menu-item index="TR">任务审核</el-menu-item>
-              <el-menu-item index="AROPT">历史审核</el-menu-item>
-              <el-menu-item index="ICC" @click="handleClickICC">
-                内部交流通道
-                <el-badge :hidden="unreadMessagesCount === 0 ? true : false" :value="unreadMessagesCount"></el-badge>
-              </el-menu-item>
-              <el-menu-item index="MA" role="AU">我的账号</el-menu-item>
-            </el-menu>
-          </div>
-        </el-col>
-        <el-col :span="18">
-          <div class="ad-main">
-            <component :is="currentComponent" :msg="msg" :socket="socket" role="AU" :mySessionId="mySessionId" @updateMsg="msg.push($event)"></component>
-          </div>
-        </el-col>
-      </el-row>
-    </div>
-  </div>
+    </el-header>
+    <el-container>
+      <el-aside width="200px">
+          <el-menu :default-active="defaultActive" class="el-menu-vertical-demo" @select="handleMenuSelect" background-color="#E9EAEB">
+            <el-menu-item index="TR">任务审核</el-menu-item>
+            <el-menu-item index="AROPT">历史审核</el-menu-item>
+            <el-menu-item index="ICC" @click="handleClickICC">
+              内部交流通道
+              <el-badge :hidden="unreadMessagesCount === 0 ? true : false" :value="unreadMessagesCount"></el-badge>
+            </el-menu-item>
+            <el-menu-item index="MA" role="AU">我的账号</el-menu-item>
+          </el-menu>
+      </el-aside>
+      <el-main class="main">
+        <component 
+          :is="currentComponent" :msg="msg" :socket="socket" :mySessionId="mySessionId" :avatar="avatar" @updateMsg="msg.push($event)"
+          class="component">
+        </component>
+      </el-main>
+    </el-container>
+  </el-container>
 </template>
 
 <script>
@@ -57,6 +54,7 @@ export default {
       msg: [],
       socket: null,
       mySessionId: '',
+      headerHeight: ''
     }
   },
   created() {
@@ -108,6 +106,9 @@ export default {
       this.$router.push('/');
       localStorage.removeItem('token');
     })
+  },
+  mounted() {
+    this.headerHeight = String(getComputedStyle(this.$refs.header.$el, null).getPropertyValue("line-height"));
   },
   beforeDestroy() {
     if(this.socket)
@@ -165,56 +166,25 @@ export default {
 </script>
 
 <style scoped>
-.ad-container {
-  background-color: #f0f2f5; /* 淡蓝色背景 */
-  color: #333; /* 深灰色文字 */
-  height: 100vh;
-  border-radius: 10px; /* 添加整体圆角 */
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* 添加阴影 */
-  overflow: hidden; /* 隐藏溢出内容 */
+.el-header {
+  position: fixed;
+  width: 100vw;
+  background-color: rgba(64, 158, 255, 0.8);
+  color: #333;
+  line-height: var(--header-height);
+  z-index: 2;
 }
-
-.ad-header {
-  padding: 20px;
-  background-color: #409eff; /* 蓝色 */
-  color: #fff; /* 白色文字 */
-  border-bottom: 1px solid #b3c0d1; /* 浅灰色底部边框 */
-  border-top-left-radius: 10px; /* 左上角圆角 */
-  border-top-right-radius: 10px; /* 右上角圆角 */
-}
-
-.ad-content {
-  padding: 20px;
-}
-
-.ad-sidebar {
-  background-color: #ffffff; /* 白色 */
-  height: calc(100vh - 40px);
-  border-right: 1px solid #b3c0d1; /* 浅灰色右侧边框 */
-  border-bottom-left-radius: 10px; /* 左下角圆角 */
-  border-top-left-radius: 10px; /* 左上角圆角 */
-  overflow: hidden; /* 隐藏溢出内容 */
-  border-bottom-right-radius: 10px; /* 右下角圆角 */
-}
-
-.ad-main {
-  padding: 20px;
-  height: calc(100vh - 40px);
-  overflow-y: auto;
-}
-
 .el-menu {
-  background-color: #ffffff; /* 白色 */
-  border-right: none; /* 移除菜单的右边框 */
-  border-radius: 10px; /* 添加菜单圆角 */
+  position: fixed;
+  height: calc(100vh - var(--header-height));
+  top: var(--header-height);
+  width: 200px;
 }
-
-.el-menu-item:hover {
-  background-color: #f0f2f5; /* 淡蓝色背景 */
+.main {
+  position: relative;
+  top: var(--header-height);
+  /* left:  */
+  z-index: 1;
 }
-
-.el-menu-item.is-active {
-  background-color: #d3e9ff; /* 选中项背景色 */
-} 
 </style>
   

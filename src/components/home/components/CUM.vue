@@ -3,14 +3,15 @@
     <SearchLine 
       @searchUser="handleSearchUser($event)"
       @searching="loading = true"
-      role="CU"></SearchLine>
+      role="CU">
+    </SearchLine>
     <el-table
       ref="table"
       :data="userArray"
       highlight-current-row
       @current-change="handleCurrentChange"
       style="width: 100%; box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1); border-radius: 10px"
-      max-height="500px"
+      height="500px"
       v-loading="loading">
       <el-table-column
         v-if="multiSelectMode"
@@ -96,6 +97,7 @@
         </template>
       </el-table-column>
     </el-table>
+    
     <div style="margin-top: 20px">
       <el-button type="primary" @click="onMultiSelect" round>多选</el-button>
       <el-button type="primary" @click="onAdd" round>增添</el-button>
@@ -128,6 +130,7 @@ export default {
   data() {
       return {
         userArray: [],
+        showArray: [],
         details: {
           userStatus: true,
           publishTaskNum: null,
@@ -333,7 +336,7 @@ export default {
             this.details.publishTaskNum = response.data['publishTaskNum'];
             this.details.id = row.id;
             this.details.name = row.name;
-            this.details.img = row.img;
+            this.details.img = 'http://8.138.119.85:8080/images' + row.img;
             this.details.phone = row.phone;
             this.details.login = row.login;
             this.details.register = row.register;

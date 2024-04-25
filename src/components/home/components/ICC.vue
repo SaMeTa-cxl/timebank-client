@@ -63,6 +63,10 @@ export default {
       this.showMoreButton = false;
     },
     sendMessage() {
+      if (this.newMessage.trim().length > 45) {
+        this.$message.error('消息过长');
+        return;
+      }
       if (this.newMessage.trim() !== '') {
         // 在这里发送消息到WebSocket服务器
         console.log('发送消息:', this.newMessage);
@@ -144,6 +148,8 @@ export default {
   height: 85vh;
   overflow-y: auto;
   overflow-x: hidden;
+  border: 2px solid antiquewhite;
+  border-radius: 10px; 
 }
 
 .header {

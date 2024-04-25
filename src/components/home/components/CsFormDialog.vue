@@ -4,7 +4,9 @@
           :visible.sync="dialogFormVisible" 
           width="600px" 
           align="left" 
-          :before-close="onClose">
+          :before-close="onClose"
+          :append-to-body="false"
+          :modal-append-to-body="false">
           <el-form ref="form" :model="formData" label-width="auto" label-position="left">
               <el-form-item label="用户编号">
                   <span>{{formData.id}}</span>

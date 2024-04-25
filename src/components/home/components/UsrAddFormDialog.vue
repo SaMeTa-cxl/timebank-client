@@ -1,5 +1,10 @@
 <template>
-    <el-dialog title="新增用户" :visible.sync="dialogFormVisible" :before-close="onClose" align = "left" center width="30%"> 
+    <el-dialog 
+        title="新增用户" :visible.sync="dialogFormVisible" 
+        :before-close="onClose" align = "left" 
+        center width="30%"
+        :append-to-body="false"
+        :modal-append-to-body="false"> 
         <el-form :model="form" label-position="left" label-width="auto" ref="form" :rules="rules">
             <el-form-item label="用户名" prop="name">
                 <el-input v-model="form.name" autocomplete="off" placeholder="请输入用户名"></el-input>

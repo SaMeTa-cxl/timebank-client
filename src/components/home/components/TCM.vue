@@ -1,8 +1,12 @@
 <template>
   <div class="time-coin-chart">
-    <span>时间币总数：{{totalCoins}}</span>
-    <el-button type="primary" @click="deliverCoins">发放时间币</el-button>
-    <div ref="chartRef" style="width: 100%; height: 400px;"></div>
+    <el-card class="chart-card">
+      <div slot="header" class="card-header">
+        <span>时间币总数：{{ totalCoins }}</span>
+        <el-button type="primary" @click="deliverCoins">发放时间币</el-button>
+      </div>
+      <div ref="chartRef" style="width: 100%; height: 400px;"></div>
+    </el-card>
   </div>
 </template>
 
@@ -59,7 +63,7 @@ export default {
         },
         yAxis: {},
         series: [{
-          name: '频率',
+          name: '频数',
           type: 'bar',
           data: frequencies // 频率数据
         }]
@@ -112,5 +116,15 @@ export default {
 .time-coin-chart {
   width: 100%;
   height: 100%;
+}
+
+.chart-card {
+  margin-top: 20px; /* 调整卡片与顶部的间距 */
+}
+
+.card-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>

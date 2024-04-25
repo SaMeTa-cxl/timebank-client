@@ -2,25 +2,67 @@
   <!-- 往期审核汇总 -->
   <div class="task-list">
     <div v-for="(task, index) in tasks" :key="index" class="task-item">
-      <el-descriptions title="任务信息">
-        <!-- <template slot="extra">
-          <el-button type="primary" size="small">更多</el-button>
-        </template> -->
-        <el-descriptions-item label="标题"> {{ task.task_title }} </el-descriptions-item>
-        <el-descriptions-item label="任务时间币数"> {{ task.task_coin}} </el-descriptions-item>
-        <el-descriptions-item label="任务发布时间"> {{new Date(task.task_begintime).toLocaleString()}} </el-descriptions-item>
-        <el-descriptions-item label="任务截止时间"> {{new Date(task.task_endtime).toLocaleString()}}</el-descriptions-item>
-        <el-descriptions-item label="任务地点"> {{task.task_location}}</el-descriptions-item>
-        <el-descriptions-item label="任务发布者编号"> {{task.task_publisherId}}</el-descriptions-item>
-        <el-descriptions-item label="任务发布者名字"> {{task.task_publisherName}}</el-descriptions-item>
-        <el-descriptions-item label="任务审核状态"> {{task.reviewStatus == '1' ? '未通过' : '通过'}}</el-descriptions-item>
-        <el-descriptions-item label="任务审核意见"> {{task.reviewAdvice}}</el-descriptions-item>
-        <el-descriptions-item label="审核员编号"> {{task.task_auId}}</el-descriptions-item>
-        <el-descriptions-item label="审核员名字"> {{task.task_auName}}</el-descriptions-item>
-        <el-descriptions-item label="审核时间"> {{ new Date(task.task_auTime).toLocaleString() }}</el-descriptions-item>
-        <el-descriptions-item label="正文"> {{ task.task_text }} </el-descriptions-item>
-      </el-descriptions>
+      <el-card style="margin-bottom: 10px;">
+        <div slot="header" class="clearfix">
+          <h3> {{ task.task_title }} </h3>
+        </div>
+        
+        <el-descriptions title="任务信息" border>
+          <el-descriptions-item label="任务地点"> 
+            <template slot="label">
+              <i class="el-icon-location"></i>
+              任务地点
+            </template>
+            {{ task.task_location }} 
+          </el-descriptions-item>
+          <el-descriptions-item label="任务时间币数"> 
+            <template slot="label">
+              <i class="el-icon-coin"></i>
+              任务时间币数
+            </template>
+            {{ task.task_coin}} 
+          </el-descriptions-item>
+          <el-descriptions-item label="任务发布时间"> 
+            <template slot="label">
+              <i class="el-icon-timer"></i>
+              任务发布时间
+            </template>
+            {{new Date(task.task_begintime).toLocaleString()}} 
+          </el-descriptions-item>
+          <el-descriptions-item label="任务截止时间"> 
+            <template slot="label">
+              <i class="el-icon-timer"></i>
+              任务截止时间
+            </template>
+            {{new Date(task.task_endtime).toLocaleString()}}
+          </el-descriptions-item>
+          <el-descriptions-item label="任务审核状态"> 
+            <template slot="label">
+              <i class="el-icon-s-flag"></i>
+              任务状态
+            </template>
+            {{task.task_status[0] == '1' ? '未通过' : '通过'}}
+          </el-descriptions-item>
+          <el-descriptions-item label="审核员编号"> 
+            <template slot="label">
+                <i class="el-icon-user"></i>
+                审核员编号
+            </template>
+            {{task.task_auid}}
+          </el-descriptions-item>
+          <el-descriptions-item label="任务审核意见" v-if="task.task_status[0] == '1'"> 
+            <template slot="label">
+                <i class="el-icon-document"></i>
+                任务审核意见
+            </template>
+            {{task.task_advice}}
+          </el-descriptions-item>
+        </el-descriptions>
+        <h4> 正文 </h4>
+        <p> {{task.task_text}} </p>
+      </el-card>
     </div>
+    <el-backtop></el-backtop>
   </div>
 </template>
 <script>

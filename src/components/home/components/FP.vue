@@ -36,9 +36,9 @@
         </div>
 
         <!-- 消息编辑窗口 -->
-        <div class="message-editor" @keyup.enter="sendMessage(value[0].senderSessionId)">
+        <div class="message-editor" @keyup.enter="sendMessage(key)">
           <el-input v-model="newMessage" placeholder="输入消息..." />
-          <el-button type="primary" @click="sendMessage(value[0].senderSessionId)" icon="el-icon-chat-dot-round">发送</el-button>
+          <el-button type="primary" @click="sendMessage(key)" icon="el-icon-chat-dot-round">发送</el-button>
         </div>
       </el-tab-pane>
     </el-tabs>
@@ -78,6 +78,13 @@ export default {
       this.refreshView();
     },
     sendMessage(cuSessionId) {
+      // console.log("feedback:",this.feedback);
+      // console.log("sendto:", cuSessionId);
+      if (this.newMessage.trim().length > 45) {
+        this.$message.error('消息过长');
+        return;
+      }
+      console.log('message\'slength is valid');
       if (this.newMessage.trim() !== '') {
         // 在这里发送消息到WebSocket服务器
         console.log('发送消息:', this.newMessage);
@@ -145,7 +152,9 @@ export default {
           csSessionId: this.mySessionId
         })
       }).then( response => {
-        this.historyFeedbacks[key] = response.data.msg;
+        this.historyFeedbacks[key] = response.data.msg.filter(el => {
+          return !this.feedback[key].some(item => item.id === el.id);
+        });
         console.log(this.historyFeedbacks);
         this.senderName[key] = response.data.msg[0].senderName;
         this.refreshView();
